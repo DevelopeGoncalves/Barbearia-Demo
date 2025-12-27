@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Victorino Barber | Estilo & Excelência</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- ESTILOS GERAIS (VICTORINO THEME) --- */
+        :root {
+            --gold-primary: #d4af37;
+            --gold-dark: #aa8420;
+            --gold-light: #fcf6ba;
+            --bg-dark: #080808;
+            --bg-card: #121212;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-dark);
+            color: #e5e5e5;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
+
+        /* Scrollbar de Luxo */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gold-primary); }
+
+        /* Efeitos Visuais */
+        .text-gold-gradient {
+            background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            background-size: 200% auto;
+            animation: shimmer 6s linear infinite;
+        }
+
+        @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .fade-in { animation: fadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .glass { background: rgba(20, 20, 20, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(212, 175, 55, 0.1); }
+        .glass-hover:hover { background: rgba(212, 175, 55, 0.05); border-color: var(--gold-primary); }
+        
+        /* Accordion Details Marker */
+        details > summary { list-style: none; cursor: pointer; }
+        details > summary::-webkit-details-marker { display: none; }
+        
+        /* Inputs Customizados */
+        .input-vic {
+            width: 100%;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .input-vic:focus { border-color: var(--gold-primary); box-shadow: 0 0 15px rgba(212,175,55,0.1); }
+        
+        /* Ajuste para a Logo */
+        .logo-img {
+            height: 50px; 
+            width: auto;
+            object-fit: contain;
+        }
+    </style>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        vic: {
+                            bg: '#080808',
+                            card: '#121212',
+                            gold: '#d4af37',
+                            goldLight: '#fcf6ba',
+                            muted: '#888888',
+                            red: '#8a1c1c' 
+                        }
+                    },
+                    backgroundImage: {
+                        'hero-pattern': "url('https://images.unsplash.com/photo-1503951914205-98c4323a7f28?auto=format&fit=crop&q=80&w=2000')",
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="selection:bg-vic-gold selection:text-black">
+    <div id="app"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+
+    <script type="text/babel">
+        // ⚠️ IMPORTANTE: SUBSTITUA PELAS SUAS CHAVES DO FIREBASE AQUI
+        const FIREBASE_CONFIG = {
+            apiKey: "SUA_API_KEY_AQUI",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            projectId: "SEU-PROJECT-ID",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+            appId: "SEU_APP_ID"
+        };
+
+        // Inicializa Firebase
+        let db;
+        try {
+            const app = firebase.initializeApp(FIREBASE_CONFIG);
+            db = firebase.firestore(app);
+        } catch (e) {
+            console.warn("Firebase não configurado (Modo Visual)", e);
+        }
+
+        const USER_ID_SIMULADO = 'cliente-vip-001';
+
+        // --- DADOS REAIS E COMPLETOS (MIGRADOS DO TESTE.HTML) ---
+        const DATA_STORE = {
+            barbeiros: [
+                { id: 1, nome: 'Barbeiro 1', icon: '👨‍🦱', especialidade: 'Cortes Modernos', telefone: '5527999999999', bio: 'Especialista em degradê e visagismo moderno.' }, 
+                { id: 2, nome: 'Barbeiro 2', icon: '👨‍🦰', especialidade: 'Barbas & Detalhes', telefone: '5527999999999', bio: 'Mestre na navalha e contornos perfeitos.' },
+                { id: 3, nome: 'Barbeiro 3', icon: '👦🏻', especialidade: 'Pinturas & Platinados', telefone: '5527999999999', bio: 'Expert em colorimetria e platinados.' }
+            ],
+            // Dias de folga: 0=Dom, 1=Seg, etc.
+            indisponibilidade: {
+                'Barbeiro 1': [0, 1],      
+                'Barbeiro 2': [0, 2],     
+                'João': [0, 3]        
+            },
+            servicos: [
+                 // Cortes e Cabelo
+                { id: 1, nome: 'Corte Masculino', preco: 30.00, duracao: '40 min', icon: '✂️', group: 'Cortes e Cabelo' },
+                { id: 11, nome: 'Corte Social (Máquina)', preco: 25.00, duracao: '30 min', icon: '⚡', group: 'Cortes e Cabelo' },
+                { id: 12, nome: 'Corte Social (Tesoura)', preco: 30.00, duracao: '40 min', icon: '✂️', group: 'Cortes e Cabelo' },
+                { id: 10, nome: 'Corte Infantil', preco: 35.00, duracao: '45 min', icon: '🧒', group: 'Cortes e Cabelo' },
+                // Barba
+                { id: 2, nome: 'Barba Completa', preco: 20.00, duracao: '20 min', icon: '🪒', group: 'Barba e Detalhes' },
+                { id: 22, nome: 'Cavanhaque', preco: 15.00, duracao: '15 min', icon: '🔻', group: 'Barba e Detalhes' },
+                { id: 100, nome: 'Bigode', preco: 5.00, duracao: '5 min', icon: '〰️', group: 'Barba e Detalhes' },
+                { id: 3, nome: 'Combo (Corte + Sobrancelha)', preco: 35.00, duracao: '45 min', icon: '✨', group: 'Barba e Detalhes' },
+                { id: 7, nome: 'Sobrancelha', preco: 10.00, duracao: '10 min', icon: '👁️', group: 'Barba e Detalhes' },
+                // Química
+                { id: 4, nome: 'Pigmentação (Cabelo)', preco: 15.00, duracao: '15 min', icon: '🎨', group: 'Química e Cor' },
+                { id: 5, nome: 'Barba Pigmentada', preco: 30.00, duracao: '20 min', icon: '🎨', group: 'Química e Cor' },
+                { id: 8, nome: 'Platinado', preco: 80.00, duracao: '2h+', icon: '❄️', group: 'Química e Cor' },
+                { id: 9, nome: 'Luzes/Reflexo', preco: 70.00, duracao: '1h 30m', icon: '💡', group: 'Química e Cor' },
+                { id: 13, nome: 'Listrinha (Freestyle)', preco: 5.00, duracao: '5 min', icon: '⚡', group: 'Química e Cor' },
+            ],
+            produtos: [
+                // --- CAMISAS RETRO ---
+                { id: 101, nome: 'Camisa Europeia 01 - Clássica', preco: 120.00, categoria: 'Camisas de Times', subcategoria: 'Camisas Retro', imgPath: './img/retro1.jpg' },
+                { id: 102, nome: 'Camisa Europeia 02 - Atual Home', preco: 150.00, categoria: 'Camisas de Times', subcategoria: 'Camisas Retro', imgPath: './img/retro2.jpg' },
+                { id: 103, nome: 'Camisa Europeia 03 - Retrô Anos 90', preco: 180.00, categoria: 'Camisas de Times', subcategoria: 'Camisas Retro', imgPath: './img/retro3.jpg' },
+                { id: 104, nome: 'Camisa Europeia 04 - Treino', preco: 90.00, categoria: 'Camisas de Times', subcategoria: 'Camisas Retro', imgPath: './img/retro4.jpg' },
+                { id: 105, nome: 'Camisa Europeia 05 - Goleiro', preco: 130.00, categoria: 'Camisas de Times', subcategoria: 'Camisas Retro', imgPath: './img/retro5.jpg' },
+                
+                // --- CAMISAS ATUAIS ---
+                { id: 106, nome: 'Camisa Atuais 01 - Listrada', preco: 110.00, categoria: 'Camisas de Times', subcategoria: 'Atuais', imgPath: './img/atuais1.jpg' },
+                { id: 107, nome: 'Camisa Atuais 02 - Edição Especial', preco: 160.00, categoria: 'Camisas de Times', subcategoria: 'Atuais', imgPath: './img/atuais2.jpg' },
+                { id: 108, nome: 'Camisa Atuais 03 - Torcedor', preco: 85.00, categoria: 'Camisas de Times', subcategoria: 'Atuais', imgPath: './img/atuais3.jpg' },
+                { id: 109, nome: 'Camisa Atuais 04 - Viagem', preco: 100.00, categoria: 'Camisas de Times', subcategoria: 'Atuais', imgPath: './img/atuais4.jpg' },
+                { id: 110, nome: 'Camisa Atuais 05 - Home 2024', preco: 140.00, categoria: 'Camisas de Times', subcategoria: 'Atuais', imgPath: './img/atuais5.jpg' },
+
+                // --- CAMISAS BASQUETE ---
+                { id: 111, nome: 'Camisa Basquete 01 - NBA Jordan', preco: 170.00, categoria: 'Camisas de Times', subcategoria: 'Basquete', imgPath: './img/camisa_basket_01.jpg' },
+                { id: 112, nome: 'Camisa Basquete 02 - Time Laranja', preco: 150.00, categoria: 'Camisas de Times', subcategoria: 'Basquete', imgPath: './img/camisa_basket_02.jpg' },
+                { id: 113, nome: 'Camisa Basquete 03 - Regata Azul', preco: 130.00, categoria: 'Camisas de Times', subcategoria: 'Basquete', imgPath: './img/camisa_basket_03.jpg' },
+                { id: 114, nome: 'Camisa Basquete 04 - Retrô P&B', preco: 180.00, categoria: 'Camisas de Times', subcategoria: 'Basquete', imgPath: './img/camisa_basket_04.jpg' },
+                { id: 115, nome: 'Camisa Basquete 05 - Edição Urbana', preco: 160.00, categoria: 'Camisas de Times', subcategoria: 'Basquete', imgPath: './img/camisa_basket_05.jpg' },
+
+                // --- PERFUMES ÁRABES ---
+                { id: 116, nome: 'Perfume Árabe 01 - Oud Supreme', preco: 110.00, categoria: 'Perfumes', subcategoria: 'Árabes', imgPath: './img/arabe1.jpg' },
+                { id: 117, nome: 'Perfume Árabe 02 - Desert Night', preco: 125.00, categoria: 'Perfumes', subcategoria: 'Árabes', imgPath: './img/arabe2.jpg' },
+
+                // --- PERFUMES IMPORTADOS ---
+                { id: 118, nome: 'Perfume Importado 01 - Aqua Sport', preco: 250.00, categoria: 'Perfumes', subcategoria: 'Importados', imgPath: './img/importado1.jpg' },
+                { id: 119, nome: 'Perfume Importado 02 - Dark Noir', preco: 320.00, categoria: 'Perfumes', subcategoria: 'Importados', imgPath: './img/importado2.jpg' },
+                { id: 120, nome: 'Perfume Importado 03 - Vanilla Dream', preco: 280.00, categoria: 'Perfumes', subcategoria: 'Importados', imgPath: './img/importado3.jpg' },
+
+                // --- OBOTICÁRIO ---
+                { id: 219, nome: 'Malbec Tradicional', preco: 149.90, categoria: 'Perfumes', subcategoria: 'Oboticario', imgPath: './img/oboticario1.jpg' },
+                { id: 220, nome: 'Egeo Dolce', preco: 129.90, categoria: 'Perfumes', subcategoria: 'Oboticario', imgPath: './img/oboticario2.jpg' },
+                { id: 221, nome: 'Quasar Fire', preco: 159.90, categoria: 'Perfumes', subcategoria: 'Oboticario', imgPath: './img/oboticario3.jpg' },
+                { id: 222, nome: 'Zaad Expedition', preco: 219.90, categoria: 'Perfumes', subcategoria: 'Oboticario', imgPath: './img/oboticario4.jpg' },
+                { id: 223, nome: 'Coffee Man', preco: 139.90, categoria: 'Perfumes', subcategoria: 'Oboticario', imgPath: './img/oboticario5.jpg' },
+                { id: 224, nome: 'Lily EDP', preco: 259.90, categoria: 'Perfumes', subcategoria: 'Oboticario', imgPath: './img/oboticario6.jpg' },
+
+                // --- EUDORA ---
+                { id: 228, nome: 'Club 6 Voyage', preco: 139.00, categoria: 'Perfumes', subcategoria: 'Eudora', imgPath: './img/eudora1.jpg' },
+                { id: 229, nome: 'H Acqua', preco: 119.00, categoria: 'Perfumes', subcategoria: 'Eudora', imgPath: './img/eudora2.jpg' },
+                { id: 230, nome: 'Impression', preco: 189.00, categoria: 'Perfumes', subcategoria: 'Eudora', imgPath: './img/eudora3.jpg' },
+
+                // --- NATURA ---
+                { id: 237, nome: 'Kaiak Clássico', preco: 110.90, categoria: 'Perfumes', subcategoria: 'Natura', imgPath: './img/natura1.jpg' },
+                { id: 238, nome: 'Essencial Oud', preco: 220.90, categoria: 'Perfumes', subcategoria: 'Natura', imgPath: './img/natura2.jpg' },
+                { id: 239, nome: 'Homem Cor.Agio', preco: 180.90, categoria: 'Perfumes', subcategoria: 'Natura', imgPath: './img/natura3.jpg' },
+                { id: 240, nome: 'Luna Radiante', preco: 130.90, categoria: 'Perfumes', subcategoria: 'Natura', imgPath: './img/natura4.jpg' },
+                { id: 241, nome: 'Biografia Assinatura', preco: 150.90, categoria: 'Perfumes', subcategoria: 'Natura', imgPath: './img/natura5.jpg' },
+                { id: 242, nome: 'Ekos Flor do Luar', preco: 140.90, categoria: 'Perfumes', subcategoria: 'Natura', imgPath: './img/natura6.jpg' },
+                { id: 243, nome: 'Urbano Recria', preco: 95.90, categoria: 'Perfumes', subcategoria: 'Natura', imgPath: './img/natura7.jpg' },
+                { id: 244, nome: 'Sr N Tradicional', preco: 79.90, categoria: 'Perfumes', subcategoria: 'Natura', imgPath: './img/natura8.jpg' },
+
+                // --- JEQUITI ---
+                { id: 246, nome: 'Fábio Jr', preco: 129.00, categoria: 'Perfumes', subcategoria: 'Jequiti', imgPath: './img/jequiti1.jpg' },
+
+                // --- CABELO ---
+                { id: 247, nome: 'Gel Super Cola Black', preco: 25.00, categoria: 'Produtos de Cabelo', subcategoria: 'Gel Black & White', imgPath: './img/gelblack.jpg' },
+                { id: 251, nome: 'Gel Super Cola White', preco: 20.00, categoria: 'Produtos de Cabelo', subcategoria: 'Gel Black & White', imgPath: './img/gekwhite.jpg' },
+                { id: 248, nome: 'Matte Clean', preco: 35.00, categoria: 'Produtos de Cabelo', subcategoria: 'Pomadas', imgPath: './img/pomadablack.jpg' },
+                { id: 249, nome: 'Matte Dry', preco: 40.00, categoria: 'Produtos de Cabelo', subcategoria: 'Pomadas', imgPath: './img/pomadablack2.jpg' },
+                { id: 250, nome: 'Pomada Deluxe (White)', preco: 30.00, categoria: 'Produtos de Cabelo', subcategoria: 'Pomadas', imgPath: './img/pomadawhite.jpg' },
+                { id: 252, nome: 'Minoxidil Crescimento', preco: 85.00, categoria: 'Produtos de Cabelo', subcategoria: 'Outros', imgPath: './img/minoxidil.jpg' },
+            ]
+        };
+
+        const SHOP_CATEGORIES = [
+            { title: 'Camisas de Times', id: 'Camisas de Times', icon: '⚽', img: 'https://images.unsplash.com/photo-1580087681598-e7a932b7305d?w=500&q=80' },
+            { title: 'Perfumes', id: 'Perfumes', icon: '💧', img: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=500&q=80' },
+            { title: 'Produtos de Cabelo', id: 'Produtos de Cabelo', icon: '🧴', img: 'https://images.unsplash.com/photo-1598454443425-2e17740f9001?w=500&q=80' }
+        ];
+
+        const SHOP_SUBCATEGORIES = {
+            'Camisas de Times': [
+                { name: 'Camisas Retro', icon: '⚡' }, { name: 'Atuais', icon: '👕' }, { name: 'Basquete', icon: '🏀' }
+            ],
+            'Perfumes': [
+                { name: 'Árabes', icon: '🕌' }, { name: 'Importados', icon: '🌎' }, { name: 'Oboticario', icon: '🇧🇷' }, 
+                { name: 'Eudora', icon: '💜' }, { name: 'Natura', icon: '🌿' }, { name: 'Jequiti', icon: '✨' }
+            ],
+            'Produtos de Cabelo': [
+                { name: 'Gel Black & White', icon: '⚫⚪' }, { name: 'Pomadas', icon: '✨' }, { name: 'Outros', icon: '🧪' }
+            ]
+        };
+
+        const { useState, useEffect, useCallback } = React;
+
+        // --- COMPONENTES ---
+
+        const NavButton = ({ active, onClick, children }) => (
+            <button 
+                onClick={onClick}
+                className={`relative px-4 py-2 text-sm uppercase tracking-widest transition-colors duration-300 ${
+                    active ? 'text-vic-gold font-bold' : 'text-gray-400 hover:text-white'
+                }`}
+            >
+                {children}
+                {active && <span className="absolute bottom-0 left-0 w-full h-[1px] bg-vic-gold shadow-[0_0_10px_#d4af37]"></span>}
+            </button>
+        );
+
+        const SectionTitle = ({ title, subtitle }) => (
+            <div className="text-center mb-16 fade-in">
+                <span className="text-vic-gold text-xs font-bold uppercase tracking-[0.3em] mb-2 block">{subtitle}</span>
+                <h2 className="text-4xl md:text-5xl font-serif text-white relative inline-block">
+                    {title}
+                    <span className="block h-1 w-24 bg-vic-gold mx-auto mt-4 rounded-full opacity-80"></span>
+                </h2>
+            </div>
+        );
+
+        const Button = ({ children, onClick, full = false, variant = 'primary', disabled = false }) => (
+            <button 
+                onClick={onClick}
+                disabled={disabled}
+                className={`
+                    ${full ? 'w-full' : ''} 
+                    px-8 py-4 uppercase tracking-widest font-bold text-sm transition-all duration-300 transform hover:-translate-y-1
+                    ${disabled ? 'opacity-50 cursor-not-allowed bg-gray-800 text-gray-500' : 
+                        variant === 'primary' 
+                        ? 'bg-vic-gold text-black hover:bg-white hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]' 
+                        : 'border border-vic-gold text-vic-gold hover:bg-vic-gold hover:text-black'}
+                `}
+            >
+                {children}
+            </button>
+        );
+
+        // --- APP PRINCIPAL ---
+
+        const VictorinoApp = () => {
+            const [activeTab, setActiveTab] = useState('home');
+            const [menuOpen, setMenuOpen] = useState(false);
+            const [notification, setNotification] = useState(null);
+            
+            const [carrinho, setCarrinho] = useState([]);
+            const [storeCategory, setStoreCategory] = useState(null); 
+            const [storeSubCategory, setStoreSubCategory] = useState(null); 
+            const [searchTerm, setSearchTerm] = useState(''); // BUSCA
+
+            const [selectedServices, setSelectedServices] = useState([]);
+            const [agendamentos, setAgendamentos] = useState([]);
+            const [myAppointments, setMyAppointments] = useState([]);
+            const [form, setForm] = useState({ nome: '', telefone: '', barbeiro: '', data: '', horario: '' });
+            
+            const ALL_SLOTS = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
+
+            const showNotification = (msg, type = 'success') => {
+                setNotification({ msg, type });
+                setTimeout(() => setNotification(null), 4000);
+            };
+
+            const maskPhone = (v) => v.replace(/\D/g,"").replace(/^(\d{2})(\d{5})(\d{4}).*/,"($1) $2-$3");
+            const getDayOfWeek = (dateString) => new Date(dateString + 'T12:00:00').getDay();
+
+            const groupServices = (services) => {
+                return services.reduce((acc, service) => {
+                    const groupName = service.group || 'Geral';
+                    if (!acc[groupName]) acc[groupName] = [];
+                    acc[groupName].push(service);
+                    return acc;
+                }, {});
+            };
+
+            const calculateTotal = () => carrinho.reduce((acc, item) => acc + (item.preco * item.quantidade), 0).toFixed(2);
+            const calculateServiceTotal = () => selectedServices.reduce((acc, s) => acc + s.preco, 0).toFixed(2);
+
+            const getAvailableSlots = (date, barberName) => {
+                if (!barberName || !date) return [];
+                const bookedTimes = agendamentos
+                    .filter(appt => appt.date === date && appt.barberName === barberName)
+                    .map(appt => appt.time);
+                return ALL_SLOTS.filter(slot => !bookedTimes.includes(slot));
+            };
+
+            // --- LOCAL STORAGE (PERSISTÊNCIA DO CARRINHO) ---
+            useEffect(() => {
+                const salvo = localStorage.getItem('victorino_cart');
+                if (salvo) setCarrinho(JSON.parse(salvo));
+            }, []);
+
+            useEffect(() => {
+                localStorage.setItem('victorino_cart', JSON.stringify(carrinho));
+            }, [carrinho]);
+
+            // --- FIREBASE LOAD ---
+            useEffect(() => {
+                const loadData = async () => {
+                    if (!db) return; 
+                    try {
+                        const todayDate = new Date().toISOString().slice(0, 10);
+                        const snap = await db.collection("agendamentos").where("date", ">=", todayDate).get();
+                        setAgendamentos(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+
+                        const mySnap = await db.collection("agendamentos")
+                            .where("userId", "==", USER_ID_SIMULADO)
+                            .orderBy("date", "desc")
+                            .get();
+                        setMyAppointments(mySnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+                    } catch (e) { console.error("Erro ao carregar dados", e); }
+                };
+                loadData();
+            }, []);
+
+            // --- LÓGICA ---
+
+            const toggleCarrinho = (produto) => {
+                setCarrinho(prev => {
+                    const exists = prev.find(p => p.id === produto.id);
+                    if (exists) return prev.map(p => p.id === produto.id ? { ...p, quantidade: p.quantidade + 1 } : p);
+                    return [...prev, { ...produto, quantidade: 1 }];
+                });
+                showNotification(`"${produto.nome}" adicionado.`);
+            };
+
+            const finalizarCompra = () => {
+                const barbeiroDiego = DATA_STORE.barbeiros.find(b => b.nome === 'Diego');
+                const telefone = barbeiroDiego ? barbeiroDiego.telefone : '5527992885769';
+                
+                let msg = `🛍️ *PEDIDO LOJA VICTORINO*\n\n`;
+                carrinho.forEach(item => msg += `▪ ${item.quantidade}x ${item.nome} (R$ ${item.preco.toFixed(2)})\n`);
+                msg += `\n*TOTAL: R$ ${calculateTotal()}*\n\nAguardo instruções.`;
+
+                window.open(`https://wa.me/${telefone}?text=${encodeURIComponent(msg)}`, '_blank');
+                setCarrinho([]);
+            };
+
+            const toggleService = (service) => {
+                setSelectedServices(prev => {
+                    const exists = prev.find(s => s.id === service.id);
+                    return exists ? prev.filter(s => s.id !== service.id) : [...prev, service];
+                });
+            };
+
+            const confirmarAgendamento = async () => {
+                const rawPhone = form.telefone.replace(/\D/g, '');
+                
+                if(!form.nome || rawPhone.length < 10 || selectedServices.length === 0 || !form.barbeiro || !form.data || !form.horario) {
+                    showNotification("Preencha todos os campos e selecione serviços.", "error");
+                    return;
+                }
+
+                const serviceNames = selectedServices.map(s => s.nome).join(' + ');
+                const apptData = {
+                    clientName: form.nome,
+                    clientPhone: form.telefone,
+                    serviceName: serviceNames,
+                    barberName: form.barbeiro,
+                    date: form.data,
+                    time: form.horario,
+                    totalPrice: calculateServiceTotal(),
+                    userId: USER_ID_SIMULADO,
+                    timestamp: new Date().toISOString()
+                };
+
+                try {
+                    if (db) await db.collection("agendamentos").add(apptData);
+
+                    const barbeiro = DATA_STORE.barbeiros.find(b => b.nome === form.barbeiro);
+                    const msg = `💈 *NOVO AGENDAMENTO - VICTORINO*\n\n👤 ${form.nome}\n✂️ ${serviceNames}\n📅 ${new Date(form.data+'T12:00').toLocaleDateString('pt-BR')} às ${form.horario}\n💰 R$ ${apptData.totalPrice}`;
+                    window.open(`https://wa.me/${barbeiro.telefone}?text=${encodeURIComponent(msg)}`, '_blank');
+
+                    showNotification("Agendamento Solicitado!");
+                    setForm({ ...form, horario: '', data: '' });
+                    setSelectedServices([]);
+                    setActiveTab('meus-agendamentos');
+                    
+                    if(db) {
+                        const newDoc = { id: 'temp-'+Date.now(), ...apptData };
+                        setMyAppointments(prev => [newDoc, ...prev]);
+                    }
+
+                } catch (e) {
+                    showNotification("Erro ao salvar. Tente novamente.", "error");
+                }
+            };
+
+            const cancelarAgendamento = async (id) => {
+                if (db) await db.collection("agendamentos").doc(id).delete();
+                setMyAppointments(prev => prev.filter(a => a.id !== id));
+                showNotification("Agendamento cancelado.");
+            };
+
+            const renderStoreContent = () => {
+                if (storeCategory && storeSubCategory) {
+                    // FILTRO DE BUSCA
+                    const products = DATA_STORE.produtos.filter(p => 
+                        p.categoria === storeCategory && 
+                        p.subcategoria === storeSubCategory &&
+                        p.nome.toLowerCase().includes(searchTerm.toLowerCase())
+                    );
+
+                    return (
+                        <div className="fade-in">
+                            <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                                <button onClick={() => { setStoreSubCategory(null); setSearchTerm(''); }} className="text-vic-gold hover:text-white flex items-center gap-2">← Voltar para Subcategorias</button>
+                                <input 
+                                    type="text" 
+                                    placeholder={`Buscar em ${storeSubCategory}...`} 
+                                    className="bg-black/50 border border-vic-gold/30 rounded px-4 py-2 text-white text-sm focus:border-vic-gold outline-none w-full md:w-64"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+
+                            <h3 className="text-3xl text-white font-serif mb-8">{storeSubCategory}</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                {products.length > 0 ? products.map(p => (
+                                    <div key={p.id} className="glass p-4 rounded-lg hover:border-vic-gold transition group relative">
+                                        {/* ETIQUETA NOVO */}
+                                        {p.id > 200 && <span className="absolute top-2 left-2 bg-vic-gold text-black text-[10px] font-bold px-2 py-1 uppercase tracking-widest z-10">Novo</span>}
+                                        
+                                        <div className="h-48 overflow-hidden rounded mb-4 relative bg-black">
+                                            {/* FALLBACK DE IMAGEM */}
+                                            <img 
+                                                src={p.imgPath} 
+                                                className="w-full h-full object-cover group-hover:scale-110 transition duration-500" 
+                                                onError={(e) => {
+                                                    e.target.onerror = null; 
+                                                    e.target.src = './img/logo.png'; 
+                                                    e.target.style.objectFit = 'contain';
+                                                    e.target.style.padding = '20px';
+                                                    e.target.style.opacity = '0.7';
+                                                }} 
+                                            />
+                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                                <button onClick={() => toggleCarrinho(p)} className="bg-vic-gold text-black px-4 py-2 font-bold uppercase text-xs">Adicionar</button>
+                                            </div>
+                                        </div>
+                                        <h4 className="text-white font-serif">{p.nome}</h4>
+                                        <p className="text-vic-gold font-bold">R$ {p.preco.toFixed(2)}</p>
+                                    </div>
+                                )) : <p className="text-gray-500 col-span-4 text-center py-12">Nenhum produto encontrado com este nome.</p>}
+                            </div>
+                        </div>
+                    );
+                }
+                
+                if (storeCategory) {
+                    return (
+                        <div className="fade-in">
+                            <button onClick={() => setStoreCategory(null)} className="mb-6 text-vic-gold hover:text-white flex items-center gap-2">← Voltar para Categorias</button>
+                            <h3 className="text-3xl text-white font-serif mb-8">{storeCategory}</h3>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                                {SHOP_SUBCATEGORIES[storeCategory]?.map(sub => (
+                                    <button 
+                                        key={sub.name}
+                                        onClick={() => setStoreSubCategory(sub.name)}
+                                        className="glass p-8 text-center rounded-lg hover:bg-white/5 transition group"
+                                    >
+                                        <div className="text-4xl mb-4 text-vic-gold group-hover:scale-110 transition">{sub.icon}</div>
+                                        <span className="text-lg font-serif">{sub.name}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    );
+                }
+
+                return (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 fade-in">
+                        {SHOP_CATEGORIES.map(cat => (
+                            <div 
+                                key={cat.id} 
+                                onClick={() => setStoreCategory(cat.id)}
+                                className="group cursor-pointer relative h-80 rounded-lg overflow-hidden border border-white/10 hover:border-vic-gold transition-all duration-500"
+                            >
+                                <img src={cat.img} className="w-full h-full object-cover transition duration-700 group-hover:scale-110" />
+                                <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center group-hover:bg-black/40 transition">
+                                    <span className="text-5xl mb-4">{cat.icon}</span>
+                                    <h3 className="text-2xl font-serif text-white uppercase tracking-widest">{cat.title}</h3>
+                                    <span className="mt-4 text-vic-gold text-xs opacity-0 group-hover:opacity-100 transition transform translate-y-4 group-hover:translate-y-0">Ver Produtos</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                );
+            };
+
+            return (
+                <div className="min-h-screen relative pb-20">
+                    
+                    {/* NAVBAR */}
+                    <nav className="fixed w-full z-50 bg-black/95 backdrop-blur-md border-b border-white/10">
+                        <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+                            <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('home')}>
+                                {/* IMAGEM DA LOGO CORRIGIDA */}
+                                <img src="./img/logo.png" alt="Victorino Logo" className="logo-img" />
+                                <div>
+                                    <h1 className="text-xl font-serif text-white tracking-widest leading-none">VICTORINO</h1>
+                                    <p className="text-[10px] text-vic-gold uppercase tracking-[0.4em] leading-none mt-1">Barber & Co.</p>
+                                </div>
+                            </div>
+
+                            <div className="hidden md:flex gap-2">
+                                <NavButton active={activeTab === 'home'} onClick={() => setActiveTab('home')}>Início</NavButton>
+                                <NavButton active={activeTab === 'servicos'} onClick={() => setActiveTab('servicos')}>Serviços</NavButton>
+                                <NavButton active={activeTab === 'loja'} onClick={() => setActiveTab('loja')}>Loja</NavButton>
+                                <NavButton active={activeTab === 'meus-agendamentos'} onClick={() => setActiveTab('meus-agendamentos')}>Meus Horários</NavButton>
+                                <NavButton active={activeTab === 'agendar'} onClick={() => setActiveTab('agendar')}>Agendar</NavButton>
+                            </div>
+
+                            <div className="flex items-center gap-4">
+                                {carrinho.length > 0 && (
+                                    <button onClick={() => setActiveTab('loja')} className="relative text-vic-gold animate-bounce">
+                                        <span className="text-xl">🛍️</span>
+                                        <span className="absolute -top-2 -right-2 bg-vic-red text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">
+                                            {carrinho.reduce((a,b) => a + b.quantidade, 0)}
+                                        </span>
+                                    </button>
+                                )}
+                                <button className="md:hidden text-2xl text-vic-gold" onClick={() => setMenuOpen(!menuOpen)}>☰</button>
+                            </div>
+                        </div>
+                        {menuOpen && (
+                            <div className="md:hidden bg-vic-card border-b border-vic-gold animate-fadeIn">
+                                {['home', 'servicos', 'loja', 'meus-agendamentos', 'agendar'].map(item => (
+                                    <button 
+                                        key={item}
+                                        onClick={() => { setActiveTab(item); setMenuOpen(false); }}
+                                        className="block w-full text-left p-4 uppercase text-sm tracking-widest border-b border-white/5 text-gray-300"
+                                    >
+                                        {item.replace('-', ' ')}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </nav>
+
+                    {notification && (
+                        <div className="fixed top-24 right-4 z-[60] animate-fadeIn">
+                            <div className={`px-6 py-4 rounded shadow-2xl border-l-4 ${notification.type === 'error' ? 'bg-red-900/90 border-red-500' : 'bg-zinc-800/90 border-vic-gold'} text-white backdrop-blur-md`}>
+                                {notification.msg}
+                            </div>
+                        </div>
+                    )}
+
+                    <main className="pt-20">
+                        
+                        {/* HOME */}
+                        {activeTab === 'home' && (
+                            <>
+                                <header className="relative h-[85vh] flex items-center justify-center bg-hero-pattern bg-cover bg-center bg-fixed">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-vic-bg via-black/70 to-black/40"></div>
+                                    <div className="relative z-10 text-center px-4 fade-in">
+                                        <div className="mb-6 flex justify-center">
+                                            {/* IMAGEM DA LOGO */}
+                                            <img src="./img/logo.png" alt="Victorino" className="h-32 w-auto object-contain animate-[fadeIn_1.5s_ease-out]" />
+                                        </div>
+                                        <p className="text-vic-gold text-sm md:text-base uppercase tracking-[0.5em] mb-4">Estilo • Atitude • Excelência</p>
+                                        <h1 className="text-5xl md:text-8xl font-serif text-white mb-6">
+                                            Victorino <br/> <span className="text-gold-gradient italic text-4xl md:text-7xl">Barber Shop</span>
+                                        </h1>
+                                        <div className="flex flex-col md:flex-row gap-4 justify-center mt-8">
+                                            <Button onClick={() => setActiveTab('agendar')}>Agendar Horário</Button>
+                                            <Button variant="outline" onClick={() => setActiveTab('loja')}>Ver Produtos</Button>
+                                        </div>
+                                    </div>
+                                </header>
+                                
+                                <section className="py-20 px-6 max-w-6xl mx-auto">
+                                    <SectionTitle title="Nossa Equipe" subtitle="Os Mestres" />
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                        {DATA_STORE.barbeiros.map(barbeiro => (
+                                            <div key={barbeiro.id} className="glass p-8 text-center rounded-lg glass-hover transition-all duration-300 group">
+                                                <div className="text-6xl mb-4 transform group-hover:scale-110 transition duration-300 filter grayscale group-hover:grayscale-0">{barbeiro.icon}</div>
+                                                <h3 className="text-2xl text-white font-serif mb-2">{barbeiro.nome}</h3>
+                                                <p className="text-vic-gold text-xs uppercase tracking-widest mb-4">{barbeiro.especialidade}</p>
+                                                <p className="text-gray-500 text-sm italic">"{barbeiro.bio}"</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+                            </>
+                        )}
+
+                        {/* SERVIÇOS */}
+                        {activeTab === 'servicos' && (
+                            <div className="py-20 px-6 max-w-5xl mx-auto fade-in">
+                                <SectionTitle title="Menu de Serviços" subtitle="Excelência em Detalhes" />
+                                
+                                {Object.keys(groupServices(DATA_STORE.servicos)).map(group => (
+                                    <details key={group} open className="mb-8 glass rounded-lg overflow-hidden">
+                                        <summary className="p-6 bg-white/5 text-white font-serif text-xl flex justify-between items-center hover:bg-white/10 transition">
+                                            {group} <span className="text-vic-gold">▼</span>
+                                        </summary>
+                                        <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {groupServices(DATA_STORE.servicos)[group].map(servico => {
+                                                const isSelected = selectedServices.some(s => s.id === servico.id);
+                                                return (
+                                                    <div 
+                                                        key={servico.id} 
+                                                        onClick={() => toggleService(servico)}
+                                                        className={`p-4 border rounded cursor-pointer transition flex justify-between items-center ${isSelected ? 'border-vic-gold bg-vic-gold/10' : 'border-white/10 hover:border-white/30'}`}
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            <span className="text-2xl">{servico.icon}</span>
+                                                            <div>
+                                                                <h4 className="text-white font-medium">{servico.nome}</h4>
+                                                                <span className="text-xs text-gray-500">{servico.duracao}</span>
+                                                            </div>
+                                                        </div>
+                                                        <span className="text-vic-gold font-bold">R$ {servico.preco.toFixed(2)}</span>
+                                                    </div>
+                                                )
+                                            })}
+                                        </div>
+                                    </details>
+                                ))}
+
+                                <div className="fixed bottom-0 left-0 w-full p-4 bg-vic-card border-t border-vic-gold flex justify-between items-center z-40">
+                                    <div>
+                                        <p className="text-gray-400 text-xs uppercase tracking-widest">Total Estimado</p>
+                                        <p className="text-2xl text-white font-serif">R$ {calculateServiceTotal()}</p>
+                                    </div>
+                                    <Button onClick={() => setActiveTab('agendar')} disabled={selectedServices.length === 0}>
+                                        Agendar ({selectedServices.length})
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* LOJA */}
+                        {activeTab === 'loja' && (
+                            <div className="py-20 px-6 max-w-7xl mx-auto">
+                                <SectionTitle title="Victorino Store" subtitle="Produtos Premium" />
+                                
+                                {carrinho.length > 0 && (
+                                    <div className="mb-12 glass p-6 border-l-4 border-vic-gold flex flex-col md:flex-row justify-between items-center gap-4 sticky top-24 z-30">
+                                        <div>
+                                            <h3 className="text-white font-bold text-lg">Seu Carrinho ({carrinho.reduce((a,b)=>a+b.quantidade,0)} itens)</h3>
+                                            <p className="text-vic-muted text-sm">Total: <span className="text-vic-gold font-bold">R$ {calculateTotal()}</span></p>
+                                        </div>
+                                        <Button onClick={finalizarCompra}>Finalizar no WhatsApp</Button>
+                                    </div>
+                                )}
+                                
+                                {renderStoreContent()}
+                            </div>
+                        )}
+
+                        {/* AGENDAR */}
+                        {activeTab === 'agendar' && (
+                            <div className="py-20 px-6 max-w-3xl mx-auto fade-in">
+                                <SectionTitle title="Agendamento" subtitle="Reserve seu momento" />
+                                
+                                <div className="glass p-8 md:p-12 rounded-lg border-t-4 border-vic-gold">
+                                    
+                                    <div className="mb-8 p-4 border border-white/10 rounded bg-black/40">
+                                        <h4 className="text-vic-gold text-xs uppercase tracking-widest mb-2">Serviços Selecionados</h4>
+                                        {selectedServices.length > 0 ? (
+                                            <div className="flex flex-wrap gap-2">
+                                                {selectedServices.map(s => (
+                                                    <span key={s.id} className="bg-vic-gold/20 text-vic-gold px-3 py-1 rounded text-sm border border-vic-gold/30">
+                                                        {s.nome}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <p className="text-gray-500 text-sm">Nenhum serviço selecionado. <button onClick={() => setActiveTab('servicos')} className="text-vic-gold underline">Ir para Serviços</button></p>
+                                        )}
+                                    </div>
+
+                                    <div className="space-y-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div>
+                                                <label className="text-xs text-gray-400 uppercase tracking-widest block mb-2">Seu Nome</label>
+                                                <input type="text" value={form.nome} onChange={e => setForm({...form, nome: e.target.value})} className="input-vic rounded" placeholder="Nome Completo" />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs text-gray-400 uppercase tracking-widest block mb-2">WhatsApp</label>
+                                                <input type="text" value={form.telefone} onChange={e => setForm({...form, telefone: maskPhone(e.target.value)})} className="input-vic rounded" placeholder="(00) 00000-0000" maxLength="15" />
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="text-xs text-gray-400 uppercase tracking-widest block mb-2">Data</label>
+                                            <input 
+                                                type="date" 
+                                                min={new Date().toISOString().split('T')[0]}
+                                                value={form.data} 
+                                                onChange={e => setForm({...form, data: e.target.value, barbeiro: '', horario: ''})} 
+                                                className="input-vic rounded" 
+                                            />
+                                        </div>
+
+                                        {form.data && (
+                                            <div>
+                                                <label className="text-xs text-vic-gold uppercase tracking-widest block mb-2">Escolha o Profissional</label>
+                                                <div className="grid grid-cols-3 gap-3">
+                                                    {DATA_STORE.barbeiros.map(b => {
+                                                        const diaSemana = getDayOfWeek(form.data);
+                                                        const isOff = DATA_STORE.indisponibilidade[b.nome]?.includes(diaSemana);
+
+                                                        return (
+                                                            <button 
+                                                                key={b.id}
+                                                                disabled={isOff}
+                                                                onClick={() => setForm({...form, barbeiro: b.nome, horario: ''})}
+                                                                className={`p-4 border rounded transition flex flex-col items-center gap-2 
+                                                                    ${isOff ? 'opacity-30 cursor-not-allowed border-red-900 bg-red-900/10' : 
+                                                                      form.barbeiro === b.nome ? 'border-vic-gold bg-vic-gold/20 text-white' : 'border-white/10 text-gray-400 hover:border-white/30'}
+                                                                `}
+                                                            >
+                                                                <span className="text-2xl">{b.icon}</span>
+                                                                <span className="font-bold text-xs">{b.nome}</span>
+                                                                {isOff && <span className="text-[10px] text-red-500">FOLGA</span>}
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {form.barbeiro && (
+                                            <div>
+                                                <label className="text-xs text-vic-gold uppercase tracking-widest block mb-2">Horários Disponíveis ({form.barbeiro})</label>
+                                                <div className="grid grid-cols-4 gap-2">
+                                                    {getAvailableSlots(form.data, form.barbeiro).map(slot => (
+                                                        <button 
+                                                            key={slot}
+                                                            onClick={() => setForm({...form, horario: slot})}
+                                                            className={`py-2 px-1 rounded text-sm font-bold border transition ${
+                                                                form.horario === slot ? 'bg-vic-gold text-black border-vic-gold' : 'bg-transparent border-white/20 text-white hover:border-white'
+                                                            }`}
+                                                        >
+                                                            {slot}
+                                                        </button>
+                                                    ))}
+                                                    {getAvailableSlots(form.data, form.barbeiro).length === 0 && (
+                                                        <p className="col-span-4 text-center text-red-400 text-sm py-2">Sem horários para este dia.</p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <Button full onClick={confirmarAgendamento} disabled={!form.horario || selectedServices.length === 0}>
+                                            Confirmar Agendamento
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* MEUS AGENDAMENTOS */}
+                        {activeTab === 'meus-agendamentos' && (
+                            <div className="py-20 px-6 max-w-4xl mx-auto fade-in">
+                                <SectionTitle title="Meus Horários" subtitle="Histórico" />
+                                
+                                {myAppointments.length === 0 ? (
+                                    <div className="text-center glass p-12 rounded-lg">
+                                        <p className="text-gray-400 mb-6">Você ainda não possui agendamentos.</p>
+                                        <Button onClick={() => setActiveTab('agendar')}>Novo Agendamento</Button>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {myAppointments.map(appt => (
+                                            <div key={appt.id} className="glass p-6 rounded-lg flex flex-col md:flex-row justify-between items-center gap-4 border-l-4 border-vic-gold">
+                                                <div className="text-left">
+                                                    <h3 className="text-xl text-white font-serif">{appt.serviceName}</h3>
+                                                    <p className="text-vic-gold text-sm uppercase tracking-widest mt-1">
+                                                        {new Date(appt.date+'T12:00').toLocaleDateString('pt-BR')} às {appt.time}
+                                                    </p>
+                                                    <p className="text-gray-500 text-sm mt-1">Profissional: {appt.barberName}</p>
+                                                </div>
+                                                <button 
+                                                    onClick={() => cancelarAgendamento(appt.id)}
+                                                    className="text-red-500 hover:text-red-400 text-xs font-bold uppercase tracking-widest border border-red-900/50 px-4 py-2 rounded hover:bg-red-900/20 transition"
+                                                >
+                                                    Cancelar
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                    </main>
+
+                    <footer className="bg-black border-t border-white/10 py-12 px-6 mt-20">
+                        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
+                            <div>
+                                <h2 className="text-2xl font-serif text-white mb-2">VICTORINO BARBER</h2>
+                                <p className="text-gray-500 text-sm">Estilo • Atitude • Excelência</p>
+                            </div>
+                            <div className="text-gray-400 text-sm">
+                                <p className="mb-1">📍 Centro Empresarial, Loja 01 - ES</p>
+                                <p>⏰ Seg à Sex: 09h - 19h | Sáb: 09h - 18h</p>
+                            </div>
+                            <div className="flex gap-4">
+                                <a href="#" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-vic-gold hover:text-black hover:border-vic-gold transition">IG</a>
+                                <a href="#" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-vic-gold hover:text-black hover:border-vic-gold transition">WA</a>
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('app'));
+        root.render(<VictorinoApp />);
+    </script>
+</body>
+</html>
