@@ -130,12 +130,34 @@
 
         const USER_ID_SIMULADO = 'cliente-vip-001';
 
-        // --- DADOS REAIS E COMPLETOS (MIGRADOS DO TESTE.HTML) ---
+        // --- DADOS REAIS E COMPLETOS ---
         const DATA_STORE = {
+            // --- MODIFICAÇÃO AQUI: FOTOS DOS BARBEIROS ---
             barbeiros: [
-                { id: 1, nome: 'Barbeiro 1', icon: '👨‍🦱', especialidade: 'Cortes Modernos', telefone: '5527999999999', bio: 'Especialista em degradê e visagismo moderno.' }, 
-                { id: 2, nome: 'Barbeiro 2', icon: '👨‍🦰', especialidade: 'Barbas & Detalhes', telefone: '5527999999999', bio: 'Mestre na navalha e contornos perfeitos.' },
-                { id: 3, nome: 'Barbeiro 3', icon: '👦🏻', especialidade: 'Pinturas & Platinados', telefone: '5527999999999', bio: 'Expert em colorimetria e platinados.' }
+                { 
+                    id: 1, 
+                    nome: 'Barbeiro 1', 
+                    imgPath: './img/barbeiro1.jpg', // Coloque a foto nesta pasta
+                    especialidade: 'Cortes Modernos', 
+                    telefone: '5527999999999', 
+                    bio: 'Especialista em degradê e visagismo moderno.' 
+                }, 
+                { 
+                    id: 2, 
+                    nome: 'Barbeiro 2', 
+                    imgPath: './img/barbeiro2.jpg', // Coloque a foto nesta pasta
+                    especialidade: 'Barbas & Detalhes', 
+                    telefone: '5527999999999', 
+                    bio: 'Mestre na navalha e contornos perfeitos.' 
+                },
+                { 
+                    id: 3, 
+                    nome: 'Barbeiro 3', 
+                    imgPath: './img/barbeiro3.jpg', // Coloque a foto nesta pasta
+                    especialidade: 'Pinturas & Platinados', 
+                    telefone: '5527999999999', 
+                    bio: 'Expert em colorimetria e platinados.' 
+                }
             ],
             // Dias de folga: 0=Dom, 1=Seg, etc.
             indisponibilidade: {
@@ -628,7 +650,15 @@
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                         {DATA_STORE.barbeiros.map(barbeiro => (
                                             <div key={barbeiro.id} className="glass p-8 text-center rounded-lg glass-hover transition-all duration-300 group">
-                                                <div className="text-6xl mb-4 transform group-hover:scale-110 transition duration-300 filter grayscale group-hover:grayscale-0">{barbeiro.icon}</div>
+                                                {/* MODIFICAÇÃO: FOTO DO BARBEIRO (PERFIL) */}
+                                                <div className="w-32 h-32 mx-auto mb-4 rounded-full p-1 border border-vic-gold/50">
+                                                    <img 
+                                                        src={barbeiro.imgPath} 
+                                                        alt={barbeiro.nome}
+                                                        className="w-full h-full rounded-full object-cover filter grayscale group-hover:grayscale-0 transition duration-500 transform group-hover:scale-110"
+                                                        onError={(e) => { e.target.src = 'https://via.placeholder.com/150'; }} 
+                                                    />
+                                                </div>
                                                 <h3 className="text-2xl text-white font-serif mb-2">{barbeiro.nome}</h3>
                                                 <p className="text-vic-gold text-xs uppercase tracking-widest mb-4">{barbeiro.especialidade}</p>
                                                 <p className="text-gray-500 text-sm italic">"{barbeiro.bio}"</p>
@@ -767,7 +797,13 @@
                                                                       form.barbeiro === b.nome ? 'border-vic-gold bg-vic-gold/20 text-white' : 'border-white/10 text-gray-400 hover:border-white/30'}
                                                                 `}
                                                             >
-                                                                <span className="text-2xl">{b.icon}</span>
+                                                                {/* MODIFICAÇÃO: FOTO PEQUENA NA SELEÇÃO */}
+                                                                <img 
+                                                                    src={b.imgPath} 
+                                                                    alt={b.nome}
+                                                                    className="w-16 h-16 rounded-full object-cover border-2 border-vic-gold/30 mb-2"
+                                                                    onError={(e) => { e.target.src = 'https://via.placeholder.com/150'; }}
+                                                                />
                                                                 <span className="font-bold text-xs">{b.nome}</span>
                                                                 {isOff && <span className="text-[10px] text-red-500">FOLGA</span>}
                                                             </button>
