@@ -30,7 +30,7 @@
         h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
 
         /* Scrollbar de Luxo */
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--gold-primary); }
@@ -132,12 +132,11 @@
 
         // --- DADOS REAIS E COMPLETOS ---
         const DATA_STORE = {
-            // --- MODIFICAÇÃO AQUI: FOTOS DOS BARBEIROS ---
             barbeiros: [
                 { 
                     id: 1, 
                     nome: 'Barbeiro 1', 
-                    imgPath: './img/barbeiro1.jpg', // Coloque a foto nesta pasta
+                    imgPath: './img/barbeiro1.jpg', 
                     especialidade: 'Cortes Modernos', 
                     telefone: '5527999999999', 
                     bio: 'Especialista em degradê e visagismo moderno.' 
@@ -145,7 +144,7 @@
                 { 
                     id: 2, 
                     nome: 'Barbeiro 2', 
-                    imgPath: './img/barbeiro2.jpg', // Coloque a foto nesta pasta
+                    imgPath: './img/barbeiro2.jpg', 
                     especialidade: 'Barbas & Detalhes', 
                     telefone: '5527999999999', 
                     bio: 'Mestre na navalha e contornos perfeitos.' 
@@ -153,7 +152,7 @@
                 { 
                     id: 3, 
                     nome: 'Barbeiro 3', 
-                    imgPath: './img/barbeiro3.jpg', // Coloque a foto nesta pasta
+                    imgPath: './img/barbeiro3.jpg', 
                     especialidade: 'Pinturas & Platinados', 
                     telefone: '5527999999999', 
                     bio: 'Expert em colorimetria e platinados.' 
@@ -163,7 +162,7 @@
             indisponibilidade: {
                 'Barbeiro 1': [0, 1],      
                 'Barbeiro 2': [0, 2],     
-                'João': [0, 3]        
+                'Barbeiro 3': [0, 3]        
             },
             servicos: [
                  // Cortes e Cabelo
@@ -332,6 +331,27 @@
             
             const ALL_SLOTS = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
 
+            // --- HELPER FUNCTIONS PARA AGENDAMENTO ---
+            const getNextDates = () => {
+                const dates = [];
+                const today = new Date();
+                for (let i = 0; i < 14; i++) {
+                    const d = new Date(today);
+                    d.setDate(today.getDate() + i);
+                    dates.push(d);
+                }
+                return dates;
+            };
+
+            const formatDateDisplay = (date) => {
+                const diaSemana = date.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
+                const diaMes = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+                return { diaSemana, diaMes };
+            };
+
+            const formatDateValue = (date) => date.toISOString().split('T')[0];
+
+            // --- LOGICA GERAL ---
             const showNotification = (msg, type = 'success') => {
                 setNotification({ msg, type });
                 setTimeout(() => setNotification(null), 4000);
@@ -741,6 +761,7 @@
                                 
                                 <div className="glass p-8 md:p-12 rounded-lg border-t-4 border-vic-gold">
                                     
+                                    {/* Resumo dos Serviços */}
                                     <div className="mb-8 p-4 border border-white/10 rounded bg-black/40">
                                         <h4 className="text-vic-gold text-xs uppercase tracking-widest mb-2">Serviços Selecionados</h4>
                                         {selectedServices.length > 0 ? (
@@ -756,7 +777,8 @@
                                         )}
                                     </div>
 
-                                    <div className="space-y-6">
+                                    <div className="space-y-8">
+                                        {/* 1. Dados Pessoais */}
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div>
                                                 <label className="text-xs text-gray-400 uppercase tracking-widest block mb-2">Seu Nome</label>
@@ -768,68 +790,92 @@
                                             </div>
                                         </div>
 
+                                        <div className="w-full h-[1px] bg-white/10"></div>
+
+                                        {/* 2. Seleção de Barbeiro (AGORA VEM PRIMEIRO) */}
                                         <div>
-                                            <label className="text-xs text-gray-400 uppercase tracking-widest block mb-2">Data</label>
-                                            <input 
-                                                type="date" 
-                                                min={new Date().toISOString().split('T')[0]}
-                                                value={form.data} 
-                                                onChange={e => setForm({...form, data: e.target.value, barbeiro: '', horario: ''})} 
-                                                className="input-vic rounded" 
-                                            />
+                                            <label className="text-xs text-vic-gold uppercase tracking-widest block mb-4">1. Escolha o Profissional</label>
+                                            <div className="grid grid-cols-3 gap-3">
+                                                {DATA_STORE.barbeiros.map(b => (
+                                                    <button 
+                                                        key={b.id}
+                                                        onClick={() => setForm({...form, barbeiro: b.nome, data: '', horario: ''})}
+                                                        className={`p-4 border rounded transition flex flex-col items-center gap-2 group
+                                                            ${form.barbeiro === b.nome 
+                                                                ? 'border-vic-gold bg-vic-gold/20 text-white shadow-[0_0_15px_rgba(212,175,55,0.3)]' 
+                                                                : 'border-white/10 text-gray-400 hover:border-white/30 hover:bg-white/5'}
+                                                        `}
+                                                    >
+                                                        <img 
+                                                            src={b.imgPath} 
+                                                            alt={b.nome}
+                                                            className={`w-16 h-16 rounded-full object-cover border-2 mb-2 transition duration-300
+                                                                ${form.barbeiro === b.nome ? 'border-vic-gold scale-110' : 'border-gray-600 grayscale group-hover:grayscale-0'}
+                                                            `}
+                                                            onError={(e) => { e.target.src = 'https://via.placeholder.com/150'; }}
+                                                        />
+                                                        <span className={`font-bold text-xs ${form.barbeiro === b.nome ? 'text-vic-gold' : ''}`}>{b.nome}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
 
-                                        {form.data && (
-                                            <div>
-                                                <label className="text-xs text-vic-gold uppercase tracking-widest block mb-2">Escolha o Profissional</label>
-                                                <div className="grid grid-cols-3 gap-3">
-                                                    {DATA_STORE.barbeiros.map(b => {
-                                                        const diaSemana = getDayOfWeek(form.data);
-                                                        const isOff = DATA_STORE.indisponibilidade[b.nome]?.includes(diaSemana);
+                                        {/* 3. Seleção de Datas (Só aparece se tiver barbeiro selecionado) */}
+                                        {form.barbeiro && (
+                                            <div className="fade-in">
+                                                <label className="text-xs text-vic-gold uppercase tracking-widest block mb-4">2. Dias Disponíveis ({form.barbeiro})</label>
+                                                <div className="flex gap-3 overflow-x-auto pb-4 custom-scrollbar">
+                                                    {getNextDates().filter(date => {
+                                                        // Filtra os dias que o barbeiro NÃO trabalha
+                                                        const diaSemana = date.getDay(); // 0 = Domingo
+                                                        const diasFolga = DATA_STORE.indisponibilidade[form.barbeiro] || [];
+                                                        return !diasFolga.includes(diaSemana);
+                                                    }).map((date, index) => {
+                                                        const dateValue = formatDateValue(date);
+                                                        const { diaSemana, diaMes } = formatDateDisplay(date);
+                                                        const isSelected = form.data === dateValue;
 
                                                         return (
                                                             <button 
-                                                                key={b.id}
-                                                                disabled={isOff}
-                                                                onClick={() => setForm({...form, barbeiro: b.nome, horario: ''})}
-                                                                className={`p-4 border rounded transition flex flex-col items-center gap-2 
-                                                                    ${isOff ? 'opacity-30 cursor-not-allowed border-red-900 bg-red-900/10' : 
-                                                                      form.barbeiro === b.nome ? 'border-vic-gold bg-vic-gold/20 text-white' : 'border-white/10 text-gray-400 hover:border-white/30'}
+                                                                key={index}
+                                                                onClick={() => setForm({...form, data: dateValue, horario: ''})}
+                                                                className={`min-w-[80px] p-3 rounded border text-center transition flex flex-col items-center justify-center
+                                                                    ${isSelected 
+                                                                        ? 'bg-vic-gold border-vic-gold text-black font-bold' 
+                                                                        : 'border-white/20 text-white hover:border-vic-gold hover:text-vic-gold bg-black/50'}
                                                                 `}
                                                             >
-                                                                {/* MODIFICAÇÃO: FOTO PEQUENA NA SELEÇÃO */}
-                                                                <img 
-                                                                    src={b.imgPath} 
-                                                                    alt={b.nome}
-                                                                    className="w-16 h-16 rounded-full object-cover border-2 border-vic-gold/30 mb-2"
-                                                                    onError={(e) => { e.target.src = 'https://via.placeholder.com/150'; }}
-                                                                />
-                                                                <span className="font-bold text-xs">{b.nome}</span>
-                                                                {isOff && <span className="text-[10px] text-red-500">FOLGA</span>}
+                                                                <span className="text-[10px] uppercase tracking-wider mb-1 opacity-80">{diaSemana}</span>
+                                                                <span className="text-lg font-serif">{diaMes}</span>
                                                             </button>
-                                                        );
+                                                        )
                                                     })}
                                                 </div>
                                             </div>
                                         )}
 
-                                        {form.barbeiro && (
-                                            <div>
-                                                <label className="text-xs text-vic-gold uppercase tracking-widest block mb-2">Horários Disponíveis ({form.barbeiro})</label>
-                                                <div className="grid grid-cols-4 gap-2">
+                                        {/* 4. Seleção de Horário (Só aparece se tiver data selecionada) */}
+                                        {form.data && (
+                                            <div className="fade-in">
+                                                <label className="text-xs text-vic-gold uppercase tracking-widest block mb-4">3. Horário</label>
+                                                <div className="grid grid-cols-4 gap-3">
                                                     {getAvailableSlots(form.data, form.barbeiro).map(slot => (
                                                         <button 
                                                             key={slot}
                                                             onClick={() => setForm({...form, horario: slot})}
-                                                            className={`py-2 px-1 rounded text-sm font-bold border transition ${
-                                                                form.horario === slot ? 'bg-vic-gold text-black border-vic-gold' : 'bg-transparent border-white/20 text-white hover:border-white'
+                                                            className={`py-3 px-2 rounded text-sm font-bold border transition ${
+                                                                form.horario === slot 
+                                                                    ? 'bg-vic-gold text-black border-vic-gold shadow-lg transform scale-105' 
+                                                                    : 'bg-transparent border-white/20 text-white hover:border-white hover:bg-white/5'
                                                             }`}
                                                         >
                                                             {slot}
                                                         </button>
                                                     ))}
                                                     {getAvailableSlots(form.data, form.barbeiro).length === 0 && (
-                                                        <p className="col-span-4 text-center text-red-400 text-sm py-2">Sem horários para este dia.</p>
+                                                        <p className="col-span-4 text-center text-red-400 text-sm py-2 border border-red-900/50 rounded bg-red-900/10">
+                                                            Agenda cheia para este dia.
+                                                        </p>
                                                     )}
                                                 </div>
                                             </div>
