@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Victorino Admin | SaaS</title>
+    <title>Victorino Admin | Gestão Completa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
@@ -34,7 +34,6 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // SERVIÇOS INICIAIS (Caso o banco de dados esteja vazio)
         const SERVICOS_INICIAIS = [
             { id: 1, nome: 'Corte Masculino', preco: 30.00, duracao: '40 min', icon: '✂️', group: 'Cortes e Cabelo' },
             { id: 2, nome: 'Corte Social (Máquina)', preco: 25.00, duracao: '30 min', icon: '⚡', group: 'Cortes e Cabelo' },
@@ -44,15 +43,17 @@
         ];
 
         const AdminApp = () => {
-            const [activeTab, setActiveTab] = useState('servicos'); // Começa na aba nova para você testar
+            const [activeTab, setActiveTab] = useState('dashboard');
             const [agendamentos, setAgendamentos] = useState([]);
             const [vendas, setVendas] = useState([]); 
             const [despesas, setDespesas] = useState([]);
             const [estoque, setEstoque] = useState([]); 
-            
-            // NOVO: Estado dos Serviços
             const [servicos, setServicos] = useState([]);
+
+            // Estados de Formulários
             const [formServico, setFormServico] = useState({ id: null, nome: '', preco: '', duracao: '', icon: '✂️', group: 'Cortes e Cabelo' });
+            const [formDespesa, setFormDespesa] = useState({ descricao: '', valor: '' });
+            const [formEstoque, setFormEstoque] = useState({ id: null, nome: '', preco: '', custo: '', quantidade: '', categoria: 'Produtos de Cabelo' });
 
             const carregarDados = () => {
                 const salvos = localStorage.getItem('victorino_admin_agendamentos'); if (salvos) setAgendamentos(JSON.parse(salvos));
@@ -60,14 +61,9 @@
                 const despesasSalvas = localStorage.getItem('victorino_admin_despesas'); if (despesasSalvas) setDespesas(JSON.parse(despesasSalvas));
                 const estoqueSalvo = localStorage.getItem('victorino_admin_estoque'); if (estoqueSalvo) setEstoque(JSON.parse(estoqueSalvo));
                 
-                // Carrega os serviços
                 const servicosSalvos = localStorage.getItem('victorino_admin_servicos'); 
-                if (servicosSalvos) {
-                    setServicos(JSON.parse(servicosSalvos));
-                } else {
-                    setServicos(SERVICOS_INICIAIS);
-                    localStorage.setItem('victorino_admin_servicos', JSON.stringify(SERVICOS_INICIAIS));
-                }
+                if (servicosSalvos) { setServicos(JSON.parse(servicosSalvos)); } 
+                else { setServicos(SERVICOS_INICIAIS); localStorage.setItem('victorino_admin_servicos', JSON.stringify(SERVICOS_INICIAIS)); }
             };
 
             useEffect(() => {
@@ -76,33 +72,73 @@
                 return () => window.removeEventListener('storage', carregarDados);
             }, []);
 
+            // Efeitos para salvar automaticamente quando o estado mudar
             useEffect(() => { localStorage.setItem('victorino_admin_servicos', JSON.stringify(servicos)); }, [servicos]);
+            useEffect(() => { localStorage.setItem('victorino_admin_agendamentos', JSON.stringify(agendamentos)); }, [agendamentos]);
+            useEffect(() => { localStorage.setItem('victorino_admin_despesas', JSON.stringify(despesas)); }, [despesas]);
+            useEffect(() => { localStorage.setItem('victorino_admin_estoque', JSON.stringify(estoque)); }, [estoque]);
 
-            // Funções CRUD de Serviços (Item 14)
+            // --- FUNÇÕES CRUD SERVIÇOS ---
             const salvarServico = (e) => {
                 e.preventDefault();
                 if(!formServico.nome || !formServico.preco) return;
-                
-                if (formServico.id) { 
-                    setServicos(servicos.map(s => s.id === formServico.id ? { ...s, nome: formServico.nome, preco: parseFloat(formServico.preco), duracao: formServico.duracao, icon: formServico.icon, group: formServico.group } : s));
-                } else { 
-                    setServicos([...servicos, { id: Date.now(), nome: formServico.nome, preco: parseFloat(formServico.preco), duracao: formServico.duracao, icon: formServico.icon, group: formServico.group }]);
-                }
+                if (formServico.id) { setServicos(servicos.map(s => s.id === formServico.id ? { ...formServico, preco: parseFloat(formServico.preco) } : s)); } 
+                else { setServicos([...servicos, { ...formServico, id: Date.now(), preco: parseFloat(formServico.preco) }]); }
                 setFormServico({ id: null, nome: '', preco: '', duracao: '', icon: '✂️', group: 'Cortes e Cabelo' });
             };
-            const editarServico = (serv) => setFormServico({ id: serv.id, nome: serv.nome, preco: serv.preco, duracao: serv.duracao, icon: serv.icon, group: serv.group });
             const excluirServico = (id) => setServicos(servicos.filter(s => s.id !== id));
+            const servicosAgrupados = servicos.reduce((acc, serv) => { if (!acc[serv.group]) acc[serv.group] = []; acc[serv.group].push(serv); return acc; }, {});
 
-            // Agrupa serviços para exibir na tabela organizados
-            const servicosAgrupados = servicos.reduce((acc, serv) => {
-                if (!acc[serv.group]) acc[serv.group] = [];
-                acc[serv.group].push(serv);
+            // --- FUNÇÕES AGENDA ---
+            const mudarStatusAgendamento = (id, status) => {
+                setAgendamentos(agendamentos.map(a => a.id === id ? { ...a, status } : a));
+            };
+            const excluirAgendamento = (id) => {
+                if(confirm("Deseja realmente excluir este agendamento?")) setAgendamentos(agendamentos.filter(a => a.id !== id));
+            };
+
+            // --- FUNÇÕES FINANCEIRO ---
+            const adicionarDespesa = (e) => {
+                e.preventDefault();
+                if(!formDespesa.descricao || !formDespesa.valor) return;
+                setDespesas([...despesas, { id: Date.now(), descricao: formDespesa.descricao, valor: parseFloat(formDespesa.valor), data: new Date().toLocaleDateString('pt-BR') }]);
+                setFormDespesa({ descricao: '', valor: '' });
+            };
+            const excluirDespesa = (id) => setDespesas(despesas.filter(d => d.id !== id));
+            
+            // Cálculos Dashboard
+            const faturamentoServicos = agendamentos.filter(a => a.status === 'concluido').reduce((acc, a) => acc + (a.totalPrice || 0), 0);
+            const faturamentoVendas = vendas.reduce((acc, v) => acc + (v.price || 0), 0);
+            const totalDespesas = despesas.reduce((acc, d) => acc + (d.valor || 0), 0);
+            const saldoLiquido = (faturamentoServicos + faturamentoVendas) - totalDespesas;
+
+            // --- FUNÇÕES ESTOQUE ---
+            const salvarEstoque = (e) => {
+                e.preventDefault();
+                if(!formEstoque.nome || !formEstoque.quantidade) return;
+                if (formEstoque.id) { setEstoque(estoque.map(s => s.id === formEstoque.id ? { ...formEstoque, preco: parseFloat(formEstoque.preco), custo: parseFloat(formEstoque.custo), quantidade: parseInt(formEstoque.quantidade) } : s)); } 
+                else { setEstoque([...estoque, { ...formEstoque, id: Date.now(), preco: parseFloat(formEstoque.preco||0), custo: parseFloat(formEstoque.custo||0), quantidade: parseInt(formEstoque.quantidade) }]); }
+                setFormEstoque({ id: null, nome: '', preco: '', custo: '', quantidade: '', categoria: 'Produtos de Cabelo' });
+            };
+            const alterarQtd = (id, delta) => {
+                setEstoque(estoque.map(item => item.id === id ? { ...item, quantidade: Math.max(0, item.quantidade + delta) } : item));
+            };
+
+            // --- DADOS CRM ---
+            const clientesCRM = agendamentos.reduce((acc, curr) => {
+                if (!acc[curr.clientPhone]) { acc[curr.clientPhone] = { nome: curr.clientName, telefone: curr.clientPhone, visitas: 0, gastoTotal: 0, ultimaVisita: curr.date }; }
+                if (curr.status === 'concluido') {
+                    acc[curr.clientPhone].visitas += 1;
+                    acc[curr.clientPhone].gastoTotal += curr.totalPrice || 0;
+                }
+                // Atualiza a data se for mais recente
+                if (new Date(curr.date) > new Date(acc[curr.clientPhone].ultimaVisita)) { acc[curr.clientPhone].ultimaVisita = curr.date; }
                 return acc;
             }, {});
 
             return (
                 <div className="flex flex-col md:flex-row h-full w-full relative">
-                    {/* Header Mobile Omitido por brevidade no snippet, assumimos igual */}
+                    {/* Header Mobile */}
                     <header className="md:hidden bg-[#0a0a0a] border-b border-white/10 p-4 flex justify-between items-center z-40 shadow-md">
                         <div><h1 className="text-xl font-serif text-white tracking-widest leading-none">VICTORINO</h1></div>
                         <button onClick={carregarDados} className="bg-white/10 active:bg-vic-gold text-white px-3 py-2 rounded text-xs font-bold transition">🔄 Atualizar</button>
@@ -110,41 +146,311 @@
 
                     {/* Sidebar Desktop */}
                     <aside className="hidden md:flex w-64 bg-[#0a0a0a] border-r border-white/10 flex-col z-10 shadow-2xl">
-                        <div className="p-6 border-b border-white/10 text-center"><h1 className="text-xl font-serif text-white tracking-widest leading-none">VICTORINO</h1></div>
+                        <div className="p-6 border-b border-white/10 text-center">
+                            <h1 className="text-xl font-serif text-white tracking-widest leading-none">VICTORINO</h1>
+                            <p className="text-[10px] text-vic-gold uppercase tracking-[0.3em] mt-1">Admin Panel</p>
+                        </div>
                         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-                            {/* Menus Anteriores */}
                             <button onClick={() => setActiveTab('dashboard')} className={`w-full text-left px-4 py-3 rounded uppercase text-xs tracking-widest font-bold transition ${activeTab === 'dashboard' ? 'bg-vic-gold text-black' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>📊 Dashboard</button>
                             <button onClick={() => setActiveTab('agenda')} className={`w-full text-left px-4 py-3 rounded uppercase text-xs tracking-widest font-bold transition ${activeTab === 'agenda' ? 'bg-vic-gold text-black' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>📅 Agenda Geral</button>
                             <button onClick={() => setActiveTab('financeiro')} className={`w-full text-left px-4 py-3 rounded uppercase text-xs tracking-widest font-bold transition ${activeTab === 'financeiro' ? 'bg-vic-gold text-black' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>💰 Financeiro</button>
-                            <button onClick={() => setActiveTab('crm')} className={`w-full text-left px-4 py-3 rounded uppercase text-xs tracking-widest font-bold transition ${activeTab === 'crm' ? 'bg-vic-gold text-black' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>👥 CRM Clientes</button>
                             <button onClick={() => setActiveTab('estoque')} className={`w-full text-left px-4 py-3 rounded uppercase text-xs tracking-widest font-bold transition ${activeTab === 'estoque' ? 'bg-vic-gold text-black' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>📦 Estoque</button>
-                            
-                            {/* NOVO MENU: SERVIÇOS */}
                             <button onClick={() => setActiveTab('servicos')} className={`w-full text-left px-4 py-3 rounded uppercase text-xs tracking-widest font-bold transition ${activeTab === 'servicos' ? 'bg-vic-gold text-black' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>💈 Catálogo Serviços</button>
-                            
-                            <button onClick={() => setActiveTab('equipe')} className={`w-full text-left px-4 py-3 rounded uppercase text-xs tracking-widest font-bold transition ${activeTab === 'equipe' ? 'bg-vic-gold text-black' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>✂️ Equipe / Comissões</button>
+                            <button onClick={() => setActiveTab('crm')} className={`w-full text-left px-4 py-3 rounded uppercase text-xs tracking-widest font-bold transition ${activeTab === 'crm' ? 'bg-vic-gold text-black' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>👥 CRM Clientes</button>
                         </nav>
                     </aside>
 
                     <main className="flex-1 bg-vic-bg p-4 md:p-8 overflow-y-auto pb-24 md:pb-8">
                         
-                        {/* OUTRAS TELAS MANTIDAS (Ocultas aqui para economizar texto) */}
-                        {activeTab !== 'servicos' && (
-                            <div className="flex flex-col items-center justify-center h-full text-gray-500 text-center animate-[fadeIn_0.3s_ease-out]">
-                                <span className="text-4xl mb-4">⚙️</span>
-                                <h2 className="text-2xl font-serif text-white">Navegue pelo Menu</h2>
-                                <p>As outras abas (Agenda, PDV, Dashboard) continuam funcionando perfeitamente em background.</p>
+                        {/* 1. DASHBOARD */}
+                        {activeTab === 'dashboard' && (
+                            <div className="animate-[fadeIn_0.3s_ease-out]">
+                                <h2 className="text-2xl md:text-3xl font-serif text-white mb-6">Painel Geral</h2>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                                    <div className="glass p-6 rounded-lg border-l-4 border-vic-gold">
+                                        <p className="text-gray-400 text-xs uppercase tracking-widest">Saldo Líquido</p>
+                                        <h3 className={`text-3xl font-serif mt-2 ${saldoLiquido >= 0 ? 'text-white' : 'text-red-400'}`}>R$ {saldoLiquido.toFixed(2)}</h3>
+                                    </div>
+                                    <div className="glass p-6 rounded-lg border-l-4 border-blue-500">
+                                        <p className="text-gray-400 text-xs uppercase tracking-widest">Serviços Concluídos</p>
+                                        <h3 className="text-3xl font-serif text-white mt-2">R$ {faturamentoServicos.toFixed(2)}</h3>
+                                    </div>
+                                    <div className="glass p-6 rounded-lg border-l-4 border-green-500">
+                                        <p className="text-gray-400 text-xs uppercase tracking-widest">Loja / Produtos</p>
+                                        <h3 className="text-3xl font-serif text-white mt-2">R$ {faturamentoVendas.toFixed(2)}</h3>
+                                    </div>
+                                    <div className="glass p-6 rounded-lg border-l-4 border-red-800">
+                                        <p className="text-gray-400 text-xs uppercase tracking-widest">Despesas</p>
+                                        <h3 className="text-3xl font-serif text-white mt-2">R$ {totalDespesas.toFixed(2)}</h3>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    <div className="glass p-6 rounded-lg">
+                                        <h3 className="text-lg font-serif text-vic-gold mb-4">Agendamentos Recentes</h3>
+                                        <div className="space-y-3">
+                                            {agendamentos.slice(-5).reverse().map(a => (
+                                                <div key={a.id} className="bg-black/40 p-3 rounded border border-white/5 flex justify-between items-center">
+                                                    <div>
+                                                        <p className="text-white font-bold text-sm">{a.clientName}</p>
+                                                        <p className="text-xs text-gray-400">{a.serviceName} • {a.date} às {a.time}</p>
+                                                    </div>
+                                                    <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded ${a.status === 'concluido' ? 'bg-green-900/50 text-green-400' : a.status === 'cancelado' ? 'bg-red-900/50 text-red-400' : 'bg-yellow-900/50 text-yellow-400'}`}>
+                                                        {a.status || 'pendente'}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                            {agendamentos.length === 0 && <p className="text-gray-500 text-sm">Nenhum agendamento registrado.</p>}
+                                        </div>
+                                    </div>
+                                    <div className="glass p-6 rounded-lg">
+                                        <h3 className="text-lg font-serif text-vic-gold mb-4">Avisos de Estoque</h3>
+                                        <div className="space-y-3">
+                                            {estoque.filter(item => item.quantidade <= 3).map(item => (
+                                                <div key={item.id} className="bg-red-900/20 p-3 rounded border border-red-900/50 flex justify-between items-center">
+                                                    <span className="text-white text-sm">⚠️ {item.nome}</span>
+                                                    <span className="text-red-400 font-bold text-sm">{item.quantidade} restam</span>
+                                                </div>
+                                            ))}
+                                            {estoque.filter(item => item.quantidade <= 3).length === 0 && <p className="text-gray-500 text-sm">Estoque saudável. Tudo sob controle.</p>}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         )}
 
-                        {/* NOVA VIEW: GESTÃO DE SERVIÇOS (ITEM 14) */}
+                        {/* 2. AGENDA GERAL */}
+                        {activeTab === 'agenda' && (
+                            <div className="animate-[fadeIn_0.3s_ease-out]">
+                                <h2 className="text-2xl md:text-3xl font-serif text-white mb-6">Agenda Geral</h2>
+                                <div className="glass rounded-lg overflow-hidden">
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-left text-sm">
+                                            <thead className="bg-white/5 text-vic-gold uppercase tracking-wider text-[10px]">
+                                                <tr>
+                                                    <th className="p-4">Data/Hora</th>
+                                                    <th className="p-4">Cliente</th>
+                                                    <th className="p-4">Serviço</th>
+                                                    <th className="p-4">Profissional</th>
+                                                    <th className="p-4">Valor</th>
+                                                    <th className="p-4 text-center">Status / Ação</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-white/5 text-gray-300">
+                                                {agendamentos.sort((a,b) => new Date(`${b.date}T${b.time}`) - new Date(`${a.date}T${a.time}`)).map(a => (
+                                                    <tr key={a.id} className="hover:bg-white/5 transition">
+                                                        <td className="p-4 font-bold text-white whitespace-nowrap">{new Date(a.date+'T12:00').toLocaleDateString('pt-BR')} <br/><span className="text-vic-gold text-xs">{a.time}</span></td>
+                                                        <td className="p-4 whitespace-nowrap">{a.clientName}<br/><span className="text-xs text-gray-500">{a.clientPhone}</span></td>
+                                                        <td className="p-4">{a.serviceName}</td>
+                                                        <td className="p-4">{a.barberName}</td>
+                                                        <td className="p-4 text-vic-green font-bold">R$ {a.totalPrice?.toFixed(2)}</td>
+                                                        <td className="p-4">
+                                                            <div className="flex flex-col gap-1 items-center">
+                                                                <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded w-full text-center ${a.status === 'concluido' ? 'bg-green-900/50 text-green-400' : a.status === 'cancelado' ? 'bg-red-900/50 text-red-400' : 'bg-yellow-900/50 text-yellow-400'}`}>
+                                                                    {a.status || 'pendente'}
+                                                                </span>
+                                                                {(!a.status || a.status === 'pendente') && (
+                                                                    <div className="flex gap-1 w-full mt-1">
+                                                                        <button onClick={() => mudarStatusAgendamento(a.id, 'concluido')} className="flex-1 bg-vic-green hover:bg-green-600 text-white text-[10px] py-1 rounded">✔</button>
+                                                                        <button onClick={() => mudarStatusAgendamento(a.id, 'cancelado')} className="flex-1 bg-vic-red hover:bg-red-600 text-white text-[10px] py-1 rounded">✖</button>
+                                                                    </div>
+                                                                )}
+                                                                <button onClick={() => excluirAgendamento(a.id)} className="text-gray-500 hover:text-white text-[10px] underline mt-1">Excluir</button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                                {agendamentos.length === 0 && <tr><td colSpan="6" className="p-8 text-center text-gray-500">Nenhum agendamento encontrado.</td></tr>}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 3. FINANCEIRO */}
+                        {activeTab === 'financeiro' && (
+                            <div className="animate-[fadeIn_0.3s_ease-out]">
+                                <h2 className="text-2xl md:text-3xl font-serif text-white mb-6">Fluxo de Caixa</h2>
+                                
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                    {/* Lançar Despesa */}
+                                    <div className="glass p-6 rounded-lg h-fit border-t-4 border-red-800">
+                                        <h3 className="text-lg font-serif text-white mb-4">Lançar Saída/Despesa</h3>
+                                        <form onSubmit={adicionarDespesa} className="space-y-4">
+                                            <div>
+                                                <label className="text-[10px] text-gray-400 uppercase tracking-widest mb-1 block">Descrição (Ex: Conta de Luz)</label>
+                                                <input type="text" required value={formDespesa.descricao} onChange={e => setFormDespesa({...formDespesa, descricao: e.target.value})} className="input-vic text-sm" />
+                                            </div>
+                                            <div>
+                                                <label className="text-[10px] text-gray-400 uppercase tracking-widest mb-1 block">Valor (R$)</label>
+                                                <input type="number" step="0.01" required value={formDespesa.valor} onChange={e => setFormDespesa({...formDespesa, valor: e.target.value})} className="input-vic text-sm" />
+                                            </div>
+                                            <button type="submit" className="w-full bg-red-900 hover:bg-red-800 text-white font-bold uppercase tracking-widest text-xs py-3 rounded transition">Registrar Despesa</button>
+                                        </form>
+                                    </div>
+
+                                    {/* Histórico */}
+                                    <div className="lg:col-span-2 space-y-6">
+                                        <div className="glass rounded-lg p-6">
+                                            <h3 className="text-lg font-serif text-vic-gold mb-4">Extrato de Despesas</h3>
+                                            <div className="space-y-2">
+                                                {despesas.map(d => (
+                                                    <div key={d.id} className="bg-black/40 p-3 rounded flex justify-between items-center border border-red-900/30">
+                                                        <div>
+                                                            <p className="text-white font-bold text-sm">{d.descricao}</p>
+                                                            <p className="text-xs text-gray-500">{d.data}</p>
+                                                        </div>
+                                                        <div className="flex items-center gap-4">
+                                                            <span className="text-red-400 font-bold">- R$ {d.valor.toFixed(2)}</span>
+                                                            <button onClick={() => excluirDespesa(d.id)} className="text-gray-500 hover:text-white">🗑️</button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                                {despesas.length === 0 && <p className="text-gray-500 text-sm">Nenhuma despesa registrada.</p>}
+                                            </div>
+                                        </div>
+
+                                        <div className="glass rounded-lg p-6 border-t-4 border-green-800">
+                                            <h3 className="text-lg font-serif text-vic-gold mb-4">Vendas da Loja Online</h3>
+                                            <p className="text-xs text-gray-400 mb-4">Os pedidos feitos pelo cliente via App caem aqui.</p>
+                                            <div className="space-y-2">
+                                                {vendas.map(v => (
+                                                    <div key={v.id} className="bg-black/40 p-3 rounded flex justify-between items-center border border-green-900/30">
+                                                        <div>
+                                                            <p className="text-white font-bold text-sm">{v.description}</p>
+                                                            <p className="text-xs text-gray-500">{v.date} às {v.time} • Status: {v.method}</p>
+                                                        </div>
+                                                        <span className="text-vic-green font-bold">+ R$ {v.price.toFixed(2)}</span>
+                                                    </div>
+                                                ))}
+                                                {vendas.length === 0 && <p className="text-gray-500 text-sm">Nenhuma venda de loja registrada.</p>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 4. ESTOQUE */}
+                        {activeTab === 'estoque' && (
+                            <div className="animate-[fadeIn_0.3s_ease-out]">
+                                <h2 className="text-2xl md:text-3xl font-serif text-white mb-6">Controle de Estoque</h2>
+                                
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                    <div className="glass p-6 rounded-lg h-fit">
+                                        <h3 className="text-lg font-serif text-vic-gold mb-4">{formEstoque.id ? '✏️ Editar Produto' : '➕ Novo Produto'}</h3>
+                                        <form onSubmit={salvarEstoque} className="space-y-4">
+                                            <div>
+                                                <label className="text-[10px] text-gray-400 uppercase tracking-widest mb-1 block">Nome do Produto</label>
+                                                <input type="text" required value={formEstoque.nome} onChange={e => setFormEstoque({...formEstoque, nome: e.target.value})} className="input-vic text-sm" />
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div>
+                                                    <label className="text-[10px] text-gray-400 uppercase tracking-widest mb-1 block">Custo (R$)</label>
+                                                    <input type="number" step="0.01" value={formEstoque.custo} onChange={e => setFormEstoque({...formEstoque, custo: e.target.value})} className="input-vic text-sm" />
+                                                </div>
+                                                <div>
+                                                    <label className="text-[10px] text-gray-400 uppercase tracking-widest mb-1 block">Venda (R$)</label>
+                                                    <input type="number" step="0.01" required value={formEstoque.preco} onChange={e => setFormEstoque({...formEstoque, preco: e.target.value})} className="input-vic text-sm" />
+                                                </div>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div>
+                                                    <label className="text-[10px] text-gray-400 uppercase tracking-widest mb-1 block">Quantidade Atual</label>
+                                                    <input type="number" required value={formEstoque.quantidade} onChange={e => setFormEstoque({...formEstoque, quantidade: e.target.value})} className="input-vic text-sm" />
+                                                </div>
+                                                <div>
+                                                    <label className="text-[10px] text-gray-400 uppercase tracking-widest mb-1 block">Categoria</label>
+                                                    <select value={formEstoque.categoria} onChange={e => setFormEstoque({...formEstoque, categoria: e.target.value})} className="input-vic text-sm">
+                                                        <option value="Produtos de Cabelo">Cabelo</option>
+                                                        <option value="Perfumes">Perfumes</option>
+                                                        <option value="Camisas de Times">Camisas</option>
+                                                        <option value="Bebidas">Bebidas</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2 mt-2">
+                                                <button type="submit" className="flex-1 bg-vic-gold text-black font-bold uppercase text-xs py-3 rounded">Salvar</button>
+                                                {formEstoque.id && <button type="button" onClick={() => setFormEstoque({id:null,nome:'',preco:'',custo:'',quantidade:'',categoria:'Produtos de Cabelo'})} className="flex-1 border border-white/20 text-white font-bold uppercase text-xs py-3 rounded">Cancelar</button>}
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <div className="lg:col-span-2">
+                                        <div className="glass rounded-lg overflow-hidden">
+                                            <table className="w-full text-left text-sm">
+                                                <thead className="bg-white/5 text-vic-gold uppercase tracking-wider text-[10px]">
+                                                    <tr>
+                                                        <th className="p-4">Produto</th>
+                                                        <th className="p-4 text-center">Estoque</th>
+                                                        <th className="p-4">Preço Venda</th>
+                                                        <th className="p-4 text-right">Ações</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-white/5">
+                                                    {estoque.map(item => (
+                                                        <tr key={item.id} className="hover:bg-white/5 transition">
+                                                            <td className="p-4"><p className="text-white font-bold">{item.nome}</p><p className="text-xs text-gray-500">{item.categoria}</p></td>
+                                                            <td className="p-4">
+                                                                <div className="flex items-center justify-center gap-3">
+                                                                    <button onClick={() => alterarQtd(item.id, -1)} className="bg-white/10 w-6 h-6 rounded flex items-center justify-center text-white hover:bg-vic-gold hover:text-black">-</button>
+                                                                    <span className={`font-bold ${item.quantidade <= 3 ? 'text-red-400' : 'text-white'}`}>{item.quantidade}</span>
+                                                                    <button onClick={() => alterarQtd(item.id, 1)} className="bg-white/10 w-6 h-6 rounded flex items-center justify-center text-white hover:bg-vic-gold hover:text-black">+</button>
+                                                                </div>
+                                                            </td>
+                                                            <td className="p-4 text-vic-green font-bold">R$ {item.preco.toFixed(2)}</td>
+                                                            <td className="p-4 text-right">
+                                                                <button onClick={() => setFormEstoque(item)} className="text-gray-400 hover:text-vic-gold mr-3">✏️</button>
+                                                                <button onClick={() => {if(confirm('Excluir produto?')) setEstoque(estoque.filter(e => e.id !== item.id))}} className="text-gray-400 hover:text-red-500">🗑️</button>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                    {estoque.length === 0 && <tr><td colSpan="4" className="p-8 text-center text-gray-500">Nenhum produto em estoque.</td></tr>}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 5. CRM CLIENTES */}
+                        {activeTab === 'crm' && (
+                            <div className="animate-[fadeIn_0.3s_ease-out]">
+                                <h2 className="text-2xl md:text-3xl font-serif text-white mb-6">CRM - Fidelidade Clientes</h2>
+                                <div className="glass rounded-lg overflow-hidden p-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {Object.values(clientesCRM).sort((a,b) => b.visitas - a.visitas).map((cli, index) => (
+                                            <div key={index} className="bg-black/40 border border-white/5 p-4 rounded-lg flex items-start gap-4 hover:border-vic-gold transition">
+                                                <div className="w-12 h-12 bg-vic-gold/10 rounded-full flex items-center justify-center text-vic-gold font-serif text-xl font-bold">
+                                                    {cli.nome.charAt(0).toUpperCase()}
+                                                </div>
+                                                <div className="flex-1">
+                                                    <h3 className="text-white font-bold">{cli.nome}</h3>
+                                                    <p className="text-xs text-gray-400 mb-2">{cli.telefone}</p>
+                                                    <div className="flex justify-between text-xs">
+                                                        <span className="text-vic-gold bg-vic-gold/10 px-2 py-1 rounded">{cli.visitas} Visitas Concluídas</span>
+                                                    </div>
+                                                    <p className="text-[10px] text-gray-500 mt-2">Gasto Est.: <span className="text-vic-green font-bold">R$ {cli.gastoTotal.toFixed(2)}</span></p>
+                                                    <p className="text-[10px] text-gray-500">Última Visita: {new Date(cli.ultimaVisita+'T12:00').toLocaleDateString('pt-BR')}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {Object.keys(clientesCRM).length === 0 && <p className="text-gray-500 col-span-3 text-center py-8">Nenhum dado de cliente para exibir ainda.</p>}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 6. CATÁLOGO SERVIÇOS (O ORIGINAL QUE VOCÊ MANDOU) */}
                         {activeTab === 'servicos' && (
                             <div className="animate-[fadeIn_0.3s_ease-out]">
                                 <h2 className="text-2xl md:text-3xl font-serif text-white mb-2">Catálogo de Serviços</h2>
-                                <p className="text-gray-500 text-xs md:text-sm mb-6">Altere preços e adicione novos cortes que aparecerão no App do cliente.</p>
+                                <p className="text-gray-500 text-xs md:text-sm mb-6">Altere preços e adicione novos cortes.</p>
 
                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                    {/* Formulário de Cadastro/Edição de Serviço */}
                                     <div className="glass p-6 rounded-lg lg:col-span-1 h-fit">
                                         <h3 className="text-lg font-serif text-vic-gold mb-4">{formServico.id ? '✏️ Editar Serviço' : '➕ Novo Serviço'}</h3>
                                         <form onSubmit={salvarServico} className="space-y-4">
@@ -182,21 +488,17 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            
                                             <div className="flex gap-2 mt-2">
-                                                <button type="submit" className="flex-1 bg-vic-gold hover:bg-white text-black font-bold uppercase tracking-widest text-xs py-3 rounded transition">Salvar Serviço</button>
+                                                <button type="submit" className="flex-1 bg-vic-gold hover:bg-white text-black font-bold uppercase tracking-widest text-xs py-3 rounded transition">Salvar</button>
                                                 {formServico.id && <button type="button" onClick={() => setFormServico({id:null,nome:'',preco:'',duracao:'',icon:'✂️',group:'Cortes e Cabelo'})} className="flex-1 border border-white/20 text-white font-bold uppercase tracking-widest text-xs py-3 rounded">Cancelar</button>}
                                             </div>
                                         </form>
                                     </div>
 
-                                    {/* Lista Dinâmica de Serviços */}
                                     <div className="lg:col-span-2 space-y-6">
                                         {Object.keys(servicosAgrupados).map(grupo => (
                                             <div key={grupo} className="glass rounded-lg overflow-hidden">
-                                                <div className="bg-white/5 p-4 border-b border-white/10">
-                                                    <h3 className="text-vic-gold font-serif text-lg">{grupo}</h3>
-                                                </div>
+                                                <div className="bg-white/5 p-4 border-b border-white/10"><h3 className="text-vic-gold font-serif text-lg">{grupo}</h3></div>
                                                 <div className="p-4 space-y-3">
                                                     {servicosAgrupados[grupo].map(serv => (
                                                         <div key={serv.id} className="bg-black/40 p-3 rounded flex justify-between items-center border border-white/5 hover:border-vic-gold/50 transition">
@@ -209,9 +511,9 @@
                                                             </div>
                                                             <div className="flex items-center gap-4">
                                                                 <span className="text-lg font-bold text-vic-green">R$ {serv.preco.toFixed(2)}</span>
-                                                                <div className="flex flex-col md:flex-row gap-2 border-l border-white/10 pl-4">
-                                                                    <button onClick={() => editarServico(serv)} className="bg-white/10 p-2 rounded hover:bg-vic-gold hover:text-black text-gray-400 transition">✏️</button>
-                                                                    <button onClick={() => excluirServico(serv.id)} className="bg-red-900/30 p-2 rounded hover:bg-red-900 text-red-400 hover:text-white transition">🗑️</button>
+                                                                <div className="flex gap-2 border-l border-white/10 pl-4">
+                                                                    <button onClick={() => setFormServico(serv)} className="bg-white/10 p-2 rounded hover:bg-vic-gold hover:text-black text-gray-400">✏️</button>
+                                                                    <button onClick={() => excluirServico(serv.id)} className="bg-red-900/30 p-2 rounded hover:bg-red-900 text-red-400">🗑️</button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -225,13 +527,13 @@
                         )}
                     </main>
 
-                    {/* MENU INFERIOR MOBILE COM ROLAGEM HORIZONTAL (Para caber tudo) */}
+                    {/* MENU INFERIOR MOBILE */}
                     <nav className="md:hidden fixed bottom-0 w-full bg-[#0a0a0a]/95 backdrop-blur-md border-t border-white/10 h-16 z-50 overflow-x-auto scroll-no-bar flex items-center px-2 space-x-4">
                         <button onClick={() => setActiveTab('dashboard')} className={`flex-shrink-0 flex flex-col items-center justify-center w-16 h-full transition ${activeTab === 'dashboard' ? 'text-vic-gold' : 'text-gray-500'}`}><span className="text-lg mb-1">📊</span><span className="text-[8px] uppercase font-bold">Painel</span></button>
                         <button onClick={() => setActiveTab('agenda')} className={`flex-shrink-0 flex flex-col items-center justify-center w-16 h-full transition ${activeTab === 'agenda' ? 'text-vic-gold' : 'text-gray-500'}`}><span className="text-lg mb-1">📅</span><span className="text-[8px] uppercase font-bold">Agenda</span></button>
                         <button onClick={() => setActiveTab('financeiro')} className={`flex-shrink-0 flex flex-col items-center justify-center w-16 h-full transition ${activeTab === 'financeiro' ? 'text-vic-gold' : 'text-gray-500'}`}><span className="text-lg mb-1">💰</span><span className="text-[8px] uppercase font-bold">Caixa</span></button>
-                        <button onClick={() => setActiveTab('servicos')} className={`flex-shrink-0 flex flex-col items-center justify-center w-16 h-full transition ${activeTab === 'servicos' ? 'text-vic-gold' : 'text-gray-500'}`}><span className="text-lg mb-1">💈</span><span className="text-[8px] uppercase font-bold">Serviços</span></button>
                         <button onClick={() => setActiveTab('estoque')} className={`flex-shrink-0 flex flex-col items-center justify-center w-16 h-full transition ${activeTab === 'estoque' ? 'text-vic-gold' : 'text-gray-500'}`}><span className="text-lg mb-1">📦</span><span className="text-[8px] uppercase font-bold">Estoque</span></button>
+                        <button onClick={() => setActiveTab('servicos')} className={`flex-shrink-0 flex flex-col items-center justify-center w-16 h-full transition ${activeTab === 'servicos' ? 'text-vic-gold' : 'text-gray-500'}`}><span className="text-lg mb-1">💈</span><span className="text-[8px] uppercase font-bold">Serviços</span></button>
                         <button onClick={() => setActiveTab('crm')} className={`flex-shrink-0 flex flex-col items-center justify-center w-16 h-full transition ${activeTab === 'crm' ? 'text-vic-gold' : 'text-gray-500'}`}><span className="text-lg mb-1">👥</span><span className="text-[8px] uppercase font-bold">CRM</span></button>
                     </nav>
                 </div>

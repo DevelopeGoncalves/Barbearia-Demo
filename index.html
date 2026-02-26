@@ -677,11 +677,11 @@
                         </div>
                         {menuOpen && (
                             <div className="md:hidden bg-vic-card border-b border-vic-gold animate-fadeIn">
-                                {['home', 'servicos', 'loja', 'agendar', 'fidelidade'].map(t => (
+                                {['home', 'servicos', 'loja', 'agendar', 'fidelidade'].map(item => (
                                     <button 
                                         key={item}
                                         onClick={() => { setActiveTab(item); setMenuOpen(false); }}
-                                        className="block w-full text-left p-4 uppercase text-sm tracking-widest border-b border-white/5 text-gray-300"
+                                        className="block w-full text-left p-4 uppercase text-sm tracking-widest border-b border-white/5 text-gray-300 hover:bg-white/5 transition"
                                     >
                                         {item.replace('-', ' ')}
                                     </button>
