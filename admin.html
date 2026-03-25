@@ -2,30 +2,60 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Victorino Admin | Gestão Completa</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Victorino Barber | ERP & Gestão</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root { --gold-primary: #d4af37; --bg-dark: #080808; }
-        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-dark); color: #e5e5e5; -webkit-tap-highlight-color: transparent; }
-        h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
-        .glass { background: rgba(20, 20, 20, 0.85); border: 1px solid rgba(212, 175, 55, 0.1); }
-        .input-vic { width: 100%; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 0.75rem; border-radius: 0.5rem; outline: none; transition: all 0.3s; }
-        .input-vic:focus { border-color: var(--gold-primary); }
-        .scroll-no-bar::-webkit-scrollbar { display: none; }
+        :root { --gold: #c9a84c; --gold-light: #f0d98c; --bg: #050505; --card: #111111; --border: rgba(255,255,255,0.08); --text: #e8e8e8; --muted: #888; --success: #5bdd5b; --danger: #ff5b5b; --warning: #f5a623; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Jost', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; margin: 0; padding: 0; }
+        .serif { font-family: 'Cormorant Garamond', serif; }
+        
+        .glass { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+        .stat-card { background: linear-gradient(135deg, var(--card), #161616); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 4px; }
+        
+        .input-field { width: 100%; background: #0a0a0a; border: 1px solid var(--border); color: var(--text); padding: 12px 14px; border-radius: 8px; outline: none; font-size: 14px; margin-top: 4px; transition: 0.2s; }
+        .input-field:focus { border-color: var(--gold); }
+        .input-field:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .btn-primary { background: var(--gold); color: #000; font-weight: 700; text-transform: uppercase; font-size: 12px; padding: 12px 20px; border-radius: 8px; border: none; cursor: pointer; width: 100%; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary:hover { background: var(--gold-light); }
+        .btn-outline { background: transparent; color: var(--gold); border: 1px solid var(--gold); font-weight: 600; text-transform: uppercase; font-size: 12px; padding: 12px 20px; border-radius: 8px; cursor: pointer; width: 100%; text-align: center; }
+        .btn-danger { background: rgba(255, 91, 91, 0.1); color: var(--danger); border: 1px solid rgba(255, 91, 91, 0.3); font-weight: 600; font-size: 11px; padding: 8px 12px; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
+        
+        .tab-btn { flex: 1; padding: 12px; text-align: center; font-size: 12px; font-weight: 600; border-bottom: 2px solid transparent; color: var(--muted); cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; }
+        .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+        
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.pendente { background: rgba(245, 166, 35, 0.1); color: var(--warning); border: 1px solid rgba(245, 166, 35, 0.3); }
+        .badge.concluido { background: rgba(91, 221, 91, 0.1); color: var(--success); border: 1px solid rgba(91, 221, 91, 0.3); }
+        .badge.cancelado { background: rgba(255, 91, 91, 0.1); color: var(--danger); border: 1px solid rgba(255, 91, 91, 0.3); }
+        .badge.bloqueio { background: rgba(136, 136, 136, 0.2); color: #fff; border: 1px solid rgba(136, 136, 136, 0.5); }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: var(--card); width: 100%; max-width: 450px; border-radius: 16px; padding: 24px; border: 1px solid var(--border); max-height: 90vh; overflow-y: auto; }
+
+        .nav-sidebar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,10,0.95); backdrop-filter: blur(10px); border-top: 1px solid var(--border); display: flex; z-index: 100; padding-bottom: env(safe-area-inset-bottom, 0px); overflow-x: auto; scrollbar-width: none; }
+        .nav-sidebar::-webkit-scrollbar { display: none; }
+        .nav-item { min-width: 72px; flex: 1; text-align: center; padding: 12px 4px; color: var(--muted); font-size: 10px; font-weight: 600; text-transform: uppercase; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: 0.2s; }
+        .nav-item.active { color: var(--gold); }
+
+        .login-wrap { min-height: 100svh; display: flex; align-items: center; justify-content: center; padding: 20px; background: url('img/hero_bg.jpg') center/cover; position: relative; }
+        .login-wrap::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.98), rgba(0,0,0,0.8)); }
+        
+        .fade-in { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media(min-width: 768px) {
+            .nav-sidebar { top: 0; right: auto; width: 90px; flex-direction: column; border-top: none; border-right: 1px solid var(--border); padding-top: 20px; }
+            .nav-item { min-width: 100%; padding: 20px 4px; }
+            .main-wrap { padding-left: 90px; padding-bottom: 0; }
+        }
     </style>
-    
-    <script>
-        tailwind.config = { theme: { extend: { colors: { vic: { bg: '#080808', card: '#121212', gold: '#d4af37', muted: '#888888', green: '#1c8a43', red: '#8a1c1c' } } } } }
-    </script>
 </head>
-<body class="selection:bg-vic-gold selection:text-black flex h-screen overflow-hidden relative">
-    <div id="admin-app" class="w-full h-full"></div>
+<body>
+    <div id="admin-app"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
@@ -34,554 +64,536 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        const SERVICOS_INICIAIS = [
-            { id: 1, nome: 'Corte Masculino', preco: 30.00, duracao: '40 min', icon: '✂️', group: 'Cortes e Cabelo' },
-            { id: 2, nome: 'Corte Social (Máquina)', preco: 25.00, duracao: '30 min', icon: '⚡', group: 'Cortes e Cabelo' },
-            { id: 3, nome: 'Barba Completa', preco: 20.00, duracao: '20 min', icon: '🪒', group: 'Barba e Detalhes' },
-            { id: 4, nome: 'Platinado', preco: 80.00, duracao: '2h+', icon: '❄️', group: 'Química e Cor' },
-            { id: 5, nome: 'Sobrancelha', preco: 10.00, duracao: '10 min', icon: '👁️', group: 'Barba e Detalhes' },
-            // NOVO: Exemplo de Plano VIP
-            { id: 6, nome: 'Assinatura VIP Mensal', preco: 120.00, duracao: 'Mensal', icon: '👑', group: 'Planos VIP' }
-        ];
+        const ALL_SLOTS = ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00'];
 
-        const AdminApp = () => {
-            const [activeTab, setActiveTab] = useState('dashboard');
-            const [agendamentos, setAgendamentos] = useState([]);
-            const [vendas, setVendas] = useState([]); 
-            const [despesas, setDespesas] = useState([]);
-            const [estoque, setEstoque] = useState([]); 
-            const [servicos, setServicos] = useState([]);
+        const INITIAL_DATA = {
+            admin: { login: 'admin', senha: '123' },
+            barbeiros: [
+                { id: 1, nome: 'Barbeiro 1', login: 'barbeiro1', senha: '123', comissao: 50, img: 'img/barbeiro1.jpg', especialidade: 'Cortes Modernos', telefone: '5527999999999' },
+                { id: 2, nome: 'Barbeiro 2', login: 'barbeiro2', senha: '123', comissao: 40, img: 'img/barbeiro2.jpg', especialidade: 'Barbas & Detalhes', telefone: '5527999999999' },
+                { id: 3, nome: 'Barbeiro 3', login: 'barbeiro3', senha: '123', comissao: 50, img: 'img/barbeiro3.jpg', especialidade: 'Pinturas & Platinados', telefone: '5527999999999' }
+            ],
+            indisponibilidade: { 'Barbeiro 1': [0, 1], 'Barbeiro 2': [0, 2], 'Barbeiro 3': [0, 3] },
+            servicos: [
+                { id: 1, nome: 'Corte Masculino', preco: 30, duracao: '40 min', group: 'Cortes e Cabelo', img: 'img/corte_masculino.jpg' },
+                { id: 2, nome: 'Barba Completa', preco: 20, duracao: '20 min', group: 'Barba e Detalhes', img: 'img/barba_completa.jpg' },
+                { id: 3, nome: 'Combo Corte + Barba', preco: 45, duracao: '60 min', group: 'Barba e Detalhes', img: 'img/combo_corte_barba.jpg' }
+            ],
+            produtos: [
+                { id: 101, nome: 'Kit Pomada/Gel Black', preco: 45, categoria: 'Cabelo', img: 'img/produto_pomada.jpg', sub: 'Modeladores', estoque: 10 },
+                { id: 201, nome: 'Perfume Árabe Oud', preco: 180, categoria: 'Perfumes', img: 'img/arabe1.jpg', sub: 'Árabes', estoque: 4 }
+            ],
+            despesas: []
+        };
 
-            // Estados de Formulários
-            const [formServico, setFormServico] = useState({ id: null, nome: '', preco: '', duracao: '', icon: '✂️', group: 'Cortes e Cabelo' });
-            const [formDespesa, setFormDespesa] = useState({ descricao: '', valor: '' });
-            const [formEstoque, setFormEstoque] = useState({ id: null, nome: '', preco: '', custo: '', quantidade: '', categoria: 'Produtos de Cabelo' });
-
-            const carregarDados = () => {
-                const salvos = localStorage.getItem('victorino_admin_agendamentos'); if (salvos) setAgendamentos(JSON.parse(salvos));
-                const vendasSalvas = localStorage.getItem('victorino_admin_vendas'); if (vendasSalvas) setVendas(JSON.parse(vendasSalvas));
-                const despesasSalvas = localStorage.getItem('victorino_admin_despesas'); if (despesasSalvas) setDespesas(JSON.parse(despesasSalvas));
-                const estoqueSalvo = localStorage.getItem('victorino_admin_estoque'); if (estoqueSalvo) setEstoque(JSON.parse(estoqueSalvo));
-                
-                const servicosSalvos = localStorage.getItem('victorino_admin_servicos'); 
-                if (servicosSalvos) { setServicos(JSON.parse(servicosSalvos)); } 
-                else { setServicos(SERVICOS_INICIAIS); localStorage.setItem('victorino_admin_servicos', JSON.stringify(SERVICOS_INICIAIS)); }
+        const Icon = ({n, size=24}) => {
+            const i = {
+                dashboard: <><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></>,
+                list: <><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></>,
+                box: <><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></>,
+                dollar: <><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></>,
+                users: <><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>,
+                logout: <><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></>,
+                plus: <><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></>,
+                trash: <><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></>,
+                lock: <><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></>
             };
+            return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{i[n]}</svg>;
+        };
+
+        const App = () => {
+            const [user, setUser] = useState(() => JSON.parse(sessionStorage.getItem('vic_user')));
+            const [view, setView] = useState('dashboard');
+            
+            const [db, setDb] = useState(() => {
+                const localData = JSON.parse(localStorage.getItem('vic_data'));
+                if (localData && !localData.admin) {
+                    const updatedData = { ...localData, admin: INITIAL_DATA.admin };
+                    updatedData.barbeiros = updatedData.barbeiros.map(b => ({ ...b, login: b.login || `barbeiro${b.id}`, senha: b.senha || '123', comissao: b.comissao || 50 }));
+                    localStorage.setItem('vic_data', JSON.stringify(updatedData));
+                    return updatedData;
+                }
+                return localData || INITIAL_DATA;
+            });
+
+            const [agendamentos, setAgendamentos] = useState(() => JSON.parse(localStorage.getItem('vic_agendamentos')) || []);
+            
+            const [bloqueios, setBloqueios] = useState(() => {
+                const blks = JSON.parse(localStorage.getItem('vic_bloqueios')) || [];
+                return blks.filter(b => b.dataInicio || b.horarioInicio || b.tipo);
+            });
+            
+            const [modal, setModal] = useState(null);
+            const [form, setForm] = useState({});
+
+            // Sync functions
+            const saveDb = (newDb) => { setDb(newDb); localStorage.setItem('vic_data', JSON.stringify(newDb)); };
+            const saveAgendamentos = (arr) => { setAgendamentos(arr); localStorage.setItem('vic_agendamentos', JSON.stringify(arr)); };
+            const saveBloqueios = (arr) => { setBloqueios(arr); localStorage.setItem('vic_bloqueios', JSON.stringify(arr)); };
 
             useEffect(() => {
-                carregarDados();
-                window.addEventListener('storage', carregarDados);
-                return () => window.removeEventListener('storage', carregarDados);
+                const sync = () => {
+                    setDb(JSON.parse(localStorage.getItem('vic_data')) || INITIAL_DATA);
+                    setAgendamentos(JSON.parse(localStorage.getItem('vic_agendamentos')) || []);
+                    const blks = JSON.parse(localStorage.getItem('vic_bloqueios')) || [];
+                    setBloqueios(blks.filter(b => b.dataInicio || b.horarioInicio || b.tipo));
+                };
+                window.addEventListener('storage', sync);
+                return () => window.removeEventListener('storage', sync);
             }, []);
 
-            // Efeitos para salvar automaticamente quando o estado mudar
-            useEffect(() => { localStorage.setItem('victorino_admin_servicos', JSON.stringify(servicos)); }, [servicos]);
-            useEffect(() => { localStorage.setItem('victorino_admin_agendamentos', JSON.stringify(agendamentos)); }, [agendamentos]);
-            useEffect(() => { localStorage.setItem('victorino_admin_despesas', JSON.stringify(despesas)); }, [despesas]);
-            useEffect(() => { localStorage.setItem('victorino_admin_estoque', JSON.stringify(estoque)); }, [estoque]);
-
-            // --- FUNÇÕES CRUD SERVIÇOS ---
-            const salvarServico = (e) => {
+            /* ─── LOGIN ─── */
+            const handleLogin = (e) => {
                 e.preventDefault();
-                if(!formServico.nome || !formServico.preco) return;
-                if (formServico.id) { setServicos(servicos.map(s => s.id === formServico.id ? { ...formServico, preco: parseFloat(formServico.preco) } : s)); } 
-                else { setServicos([...servicos, { ...formServico, id: Date.now(), preco: parseFloat(formServico.preco) }]); }
-                setFormServico({ id: null, nome: '', preco: '', duracao: '', icon: '✂️', group: 'Cortes e Cabelo' });
-            };
-            const excluirServico = (id) => setServicos(servicos.filter(s => s.id !== id));
-            const servicosAgrupados = servicos.reduce((acc, serv) => { if (!acc[serv.group]) acc[serv.group] = []; acc[serv.group].push(serv); return acc; }, {});
-
-            // --- FUNÇÕES AGENDA ---
-            const mudarStatusAgendamento = (id, status) => {
-                setAgendamentos(agendamentos.map(a => a.id === id ? { ...a, status } : a));
-            };
-            const excluirAgendamento = (id) => {
-                if(confirm("Deseja realmente excluir este agendamento?")) setAgendamentos(agendamentos.filter(a => a.id !== id));
-            };
-
-            // --- FUNÇÕES FINANCEIRO ---
-            const adicionarDespesa = (e) => {
-                e.preventDefault();
-                if(!formDespesa.descricao || !formDespesa.valor) return;
-                setDespesas([...despesas, { id: Date.now(), descricao: formDespesa.descricao, valor: parseFloat(formDespesa.valor), data: new Date().toLocaleDateString('pt-BR') }]);
-                setFormDespesa({ descricao: '', valor: '' });
-            };
-            const excluirDespesa = (id) => setDespesas(despesas.filter(d => d.id !== id));
-            
-            // Cálculos Dashboard
-            const faturamentoServicos = agendamentos.filter(a => a.status === 'concluido').reduce((acc, a) => acc + (a.totalPrice || 0), 0);
-            const faturamentoVendas = vendas.reduce((acc, v) => acc + (v.price || 0), 0);
-            const totalDespesas = despesas.reduce((acc, d) => acc + (d.valor || 0), 0);
-            const saldoLiquido = (faturamentoServicos + faturamentoVendas) - totalDespesas;
-
-            // --- FUNÇÕES ESTOQUE ---
-            const salvarEstoque = (e) => {
-                e.preventDefault();
-                if(!formEstoque.nome || !formEstoque.quantidade) return;
-                if (formEstoque.id) { setEstoque(estoque.map(s => s.id === formEstoque.id ? { ...formEstoque, preco: parseFloat(formEstoque.preco), custo: parseFloat(formEstoque.custo), quantidade: parseInt(formEstoque.quantidade) } : s)); } 
-                else { setEstoque([...estoque, { ...formEstoque, id: Date.now(), preco: parseFloat(formEstoque.preco||0), custo: parseFloat(formEstoque.custo||0), quantidade: parseInt(formEstoque.quantidade) }]); }
-                setFormEstoque({ id: null, nome: '', preco: '', custo: '', quantidade: '', categoria: 'Produtos de Cabelo' });
-            };
-            const alterarQtd = (id, delta) => {
-                setEstoque(estoque.map(item => item.id === id ? { ...item, quantidade: Math.max(0, item.quantidade + delta) } : item));
-            };
-
-            // --- DADOS CRM ---
-            const clientesCRM = agendamentos.reduce((acc, curr) => {
-                if (!acc[curr.clientPhone]) { acc[curr.clientPhone] = { nome: curr.clientName, telefone: curr.clientPhone, visitas: 0, gastoTotal: 0, ultimaVisita: curr.date }; }
-                if (curr.status === 'concluido') {
-                    acc[curr.clientPhone].visitas += 1;
-                    acc[curr.clientPhone].gastoTotal += curr.totalPrice || 0;
+                const u = e.target.login.value; const p = e.target.senha.value;
+                const adminData = db.admin || INITIAL_DATA.admin;
+                
+                if (u === adminData.login && p === adminData.senha) {
+                    const session = { role: 'admin', nome: 'Administrador' };
+                    setUser(session); sessionStorage.setItem('vic_user', JSON.stringify(session));
+                } else {
+                    const b = db.barbeiros.find(x => x.login === u && x.senha === p);
+                    if (b) {
+                        const session = { role: 'barber', id: b.id, nome: b.nome, comissao: b.comissao };
+                        setUser(session); sessionStorage.setItem('vic_user', JSON.stringify(session));
+                    } else alert('Usuário ou senha incorretos.');
                 }
-                // Atualiza a data se for mais recente
-                if (new Date(curr.date) > new Date(acc[curr.clientPhone].ultimaVisita)) { acc[curr.clientPhone].ultimaVisita = curr.date; }
-                return acc;
-            }, {});
+            };
+            const logout = () => { setUser(null); sessionStorage.removeItem('vic_user'); };
+
+            if (!user) {
+                return (
+                    <div className="login-wrap">
+                        <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 360 }}>
+                            <div style={{ textAlign: 'center', marginBottom: 32 }}>
+                                <div style={{ width: 64, height: 64, background: 'var(--gold)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontSize: 32, fontWeight: 700, margin: '0 auto 16px' }}>V</div>
+                                <h1 className="serif" style={{ fontSize: 32 }}>Gestão Victorino</h1>
+                            </div>
+                            <form className="glass" onSubmit={handleLogin}>
+                                <div style={{ marginBottom: 16 }}><label style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase' }}>Usuário</label><input name="login" required className="input-field" /></div>
+                                <div style={{ marginBottom: 24 }}><label style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase' }}>Senha</label><input name="senha" type="password" required className="input-field" /></div>
+                                <button type="submit" className="btn-primary">Entrar no Sistema</button>
+                            </form>
+                        </div>
+                    </div>
+                );
+            }
+
+            const updateStatus = (id, status) => {
+                const ag = agendamentos.find(a => a.id === id);
+                if (!ag) return;
+                
+                if (status === 'concluido') {
+                    const barbeiro = db.barbeiros.find(b => b.nome === ag.barberName);
+                    const percentual = barbeiro ? barbeiro.comissao : 0;
+                    saveAgendamentos(agendamentos.map(a => a.id === id ? { ...a, status, comissao: (ag.totalPrice * percentual) / 100, pctComissao: percentual } : a));
+                } else {
+                    saveAgendamentos(agendamentos.map(a => a.id === id ? { ...a, status } : a));
+                }
+            };
+
+            /* ─── TELAS ─── */
+            
+            // 1. DASHBOARD
+            const Dashboard = () => {
+                if (user.role === 'admin') {
+                    const concluidos = agendamentos.filter(a => a.status === 'concluido');
+                    const faturamento = concluidos.reduce((acc, a) => acc + a.totalPrice, 0);
+                    const comissoes = concluidos.reduce((acc, a) => acc + (a.comissao || 0), 0);
+                    const despesasTotais = (db.despesas || []).reduce((acc, d) => acc + parseFloat(d.valor), 0);
+                    const lucroLiquido = faturamento - comissoes - despesasTotais;
+
+                    return (
+                        <div className="fade-in" style={{ padding: 20, paddingBottom: 100 }}>
+                            <h2 className="serif" style={{ fontSize: 28, marginBottom: 20 }}>Visão Geral (Admin)</h2>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 24 }}>
+                                <div className="stat-card"><p style={{ fontSize: 10, color: 'var(--muted)', textTransform: 'uppercase' }}>Faturamento Bruto</p><p className="serif" style={{ fontSize: 22, color: 'var(--text)' }}>R$ {faturamento.toFixed(2)}</p></div>
+                                <div className="stat-card"><p style={{ fontSize: 10, color: 'var(--muted)', textTransform: 'uppercase' }}>Comissões (Equipe)</p><p className="serif" style={{ fontSize: 22, color: 'var(--warning)' }}>- R$ {comissoes.toFixed(2)}</p></div>
+                                <div className="stat-card"><p style={{ fontSize: 10, color: 'var(--muted)', textTransform: 'uppercase' }}>Despesas Fixas</p><p className="serif" style={{ fontSize: 22, color: 'var(--danger)' }}>- R$ {despesasTotais.toFixed(2)}</p></div>
+                                <div className="stat-card" style={{ borderColor: lucroLiquido >= 0 ? 'var(--success)' : 'var(--danger)' }}><p style={{ fontSize: 10, color: 'var(--gold)', textTransform: 'uppercase' }}>Lucro Líquido</p><p className="serif" style={{ fontSize: 22, color: lucroLiquido >= 0 ? 'var(--success)' : 'var(--danger)' }}>R$ {lucroLiquido.toFixed(2)}</p></div>
+                            </div>
+                            <h3 className="serif" style={{ fontSize: 20, marginBottom: 12 }}>Desempenho da Equipe</h3>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                {db.barbeiros.map(b => {
+                                    const feitos = concluidos.filter(a => a.barberName === b.nome);
+                                    const prod = feitos.reduce((acc, a) => acc + a.totalPrice, 0);
+                                    return (
+                                        <div key={b.id} className="glass" style={{ display: 'flex', justifyContent: 'space-between', padding: 12, margin: 0 }}>
+                                            <div><p style={{ fontWeight: 600, fontSize: 14 }}>{b.nome}</p><p style={{ fontSize: 11, color: 'var(--muted)' }}>{feitos.length} serviços</p></div>
+                                            <div style={{ textAlign: 'right' }}><p style={{ color: 'var(--gold)', fontWeight: 700 }}>R$ {prod.toFixed(2)}</p></div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    );
+                } else {
+                    const meusConcluidos = agendamentos.filter(a => a.status === 'concluido' && a.barberName === user.nome);
+                    const minhaProducao = meusConcluidos.reduce((acc, a) => acc + a.totalPrice, 0);
+                    const minhaComissao = meusConcluidos.reduce((acc, a) => acc + (a.comissao || 0), 0);
+                    const meusPendentes = agendamentos.filter(a => (a.status === 'pendente' || !a.status) && a.barberName === user.nome).length;
+
+                    return (
+                        <div className="fade-in" style={{ padding: 20 }}>
+                            <h2 className="serif" style={{ fontSize: 28, marginBottom: 8 }}>Olá, {user.nome.split(' ')[0]}</h2>
+                            <p style={{ color: 'var(--muted)', fontSize: 13, marginBottom: 20 }}>Resumo do seu desempenho.</p>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 24 }}>
+                                <div className="stat-card"><p style={{ fontSize: 10, color: 'var(--muted)', textTransform: 'uppercase' }}>Minha Produção</p><p className="serif" style={{ fontSize: 24, color: 'var(--text)' }}>R$ {minhaProducao.toFixed(2)}</p></div>
+                                <div className="stat-card"><p style={{ fontSize: 10, color: 'var(--gold)', textTransform: 'uppercase' }}>Minha Comissão ({user.comissao}%)</p><p className="serif" style={{ fontSize: 24, color: 'var(--success)' }}>R$ {minhaComissao.toFixed(2)}</p></div>
+                            </div>
+                            <div className="glass" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderColor: meusPendentes > 0 ? 'var(--warning)' : 'var(--border)' }}>
+                                <div><p style={{ fontWeight: 700, fontSize: 16 }}>Clientes Aguardando</p><p style={{ fontSize: 12, color: 'var(--muted)' }}>Na sua agenda hoje</p></div>
+                                <div style={{ fontSize: 32, fontWeight: 700, color: meusPendentes > 0 ? 'var(--warning)' : 'var(--muted)' }}>{meusPendentes}</div>
+                            </div>
+                        </div>
+                    );
+                }
+            };
+
+            // 2. AGENDA & BLOQUEIOS
+            const Agenda = () => {
+                const agLista = user.role === 'admin' ? agendamentos : agendamentos.filter(a => a.barberName === user.nome);
+                const blkLista = user.role === 'admin' ? bloqueios : bloqueios.filter(b => b.barberName === user.nome);
+                
+                const combined = [
+                    ...agLista.map(a => ({ ...a, _type: 'agendamento', sortTime: new Date(`${a.date}T${a.time}`) })),
+                    ...blkLista.map(b => ({ ...b, _type: 'bloqueio', sortTime: new Date(`${b.tipo === 'dia' ? b.dataInicio : b.data}T${b.tipo === 'dia' ? '00:00' : b.horarioInicio}`) }))
+                ].sort((a,b) => b.sortTime - a.sortTime);
+
+                const saveBlock = () => {
+                    const novoBlock = { id: Date.now(), ...form };
+                    saveBloqueios([...bloqueios, novoBlock]);
+                    setModal(null);
+                };
+
+                const delBlock = (id) => {
+                    if(confirm("Remover este bloqueio da agenda?")) saveBloqueios(bloqueios.filter(b => b.id !== id));
+                };
+
+                const formataData = (dataStr) => dataStr ? dataStr.split('-').reverse().join('/') : '';
+
+                return (
+                    <div className="fade-in" style={{ padding: 20, paddingBottom: 100 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                            <h2 className="serif" style={{ fontSize: 28 }}>{user.role === 'admin' ? 'Agenda Geral' : 'Minha Agenda'}</h2>
+                            <button onClick={() => { 
+                                const today = new Date().toISOString().split('T')[0];
+                                setForm({ barberName: user.role === 'admin' ? db.barbeiros[0].nome : user.nome, tipo: 'horario', data: today, horarioInicio: '12:00', horarioFim: '13:00', dataInicio: today, dataFim: today, motivo: 'Almoço' }); 
+                                setModal({ type: 'bloqueio' }); 
+                            }} className="btn-outline" style={{ width: 'auto', padding: '8px 16px', borderColor: 'var(--danger)', color: 'var(--danger)' }}><Icon name="lock" size={16}/> Bloquear</button>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                            {combined.map(item => {
+                                if (item._type === 'bloqueio') {
+                                    return (
+                                        <div key={`blk-${item.id}`} className="glass" style={{ borderColor: 'rgba(136, 136, 136, 0.3)', background: 'rgba(20,20,20,0.5)' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <div>
+                                                    <p style={{ fontWeight: 700, fontSize: 14, color: '#aaa', display: 'flex', alignItems:'center', gap:6 }}><Icon name="lock" size={14}/> {item.motivo || 'Bloqueado'}</p>
+                                                    <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4 }}>{item.barberName} • {item.tipo === 'horario' ? formataData(item.data) : 'Período de Folga'}</p>
+                                                </div>
+                                                <div style={{ textAlign: 'right' }}>
+                                                    <span className="badge bloqueio">
+                                                        {item.tipo === 'dia' ? `DE ${formataData(item.dataInicio)} A ${formataData(item.dataFim)}` : `DAS ${item.horarioInicio} ÀS ${item.horarioFim}`}
+                                                    </span>
+                                                    <button onClick={() => delBlock(item.id)} style={{ display: 'block', marginTop: 8, fontSize: 11, color: 'var(--danger)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>Desbloquear</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                                
+                                return (
+                                    <div key={`ag-${item.id}`} className="glass">
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
+                                            <div>
+                                                <p style={{ fontWeight: 700, fontSize: 15 }}>{item.clientName}</p>
+                                                <p style={{ fontSize: 12, color: 'var(--muted)' }}>{item.clientPhone} {user.role === 'admin' && ` • ${item.barberName}`}</p>
+                                                <p style={{ fontSize: 13, color: 'var(--gold)', marginTop: 4 }}>{item.date ? formataData(item.date) : '-'} às {item.time}</p>
+                                            </div>
+                                            <div style={{ textAlign: 'right' }}>
+                                                <span className={`badge ${item.status || 'pendente'}`}>{item.status || 'Pendente'}</span>
+                                                <p className="serif" style={{ fontSize: 18, marginTop: 6 }}>R$ {item.totalPrice.toFixed(2)}</p>
+                                            </div>
+                                        </div>
+                                        <p style={{ fontSize: 12, background: '#1a1a1a', padding: '6px 10px', borderRadius: 6 }}>✂️ {item.serviceName}</p>
+                                        
+                                        {(item.status === 'pendente' || !item.status) && (
+                                            <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                                                <button onClick={() => updateStatus(item.id, 'concluido')} className="btn-primary" style={{ padding: 8, flex: 1, background: 'var(--success)', color: '#000' }}>Concluir</button>
+                                                <button onClick={() => saveAgendamentos(agendamentos.map(a => a.id === item.id ? { ...a, status: 'cancelado' } : a))} className="btn-danger" style={{ flex: 1 }}>Cancelar</button>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                            {combined.length === 0 && <p style={{ textAlign: 'center', color: 'var(--muted)' }}>Nenhum registro encontrado.</p>}
+                        </div>
+
+                        {modal && modal.type === 'bloqueio' && (
+                            <div className="modal-overlay">
+                                <div className="modal-content">
+                                    <h3 className="serif" style={{ fontSize: 22, marginBottom: 16 }}>Bloquear Agenda</h3>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
+                                        {user.role === 'admin' && (
+                                            <div>
+                                                <label style={{ fontSize: 11, color: 'var(--muted)' }}>PROFISSIONAL</label>
+                                                <select className="input-field" value={form.barberName} onChange={e => setForm({...form, barberName: e.target.value})}>
+                                                    {db.barbeiros.map(b => <option key={b.id} value={b.nome}>{b.nome}</option>)}
+                                                </select>
+                                            </div>
+                                        )}
+                                        
+                                        <div style={{ display: 'flex', gap: 12 }}>
+                                            <div style={{ flex: 1 }}>
+                                                <label style={{ fontSize: 11, color: 'var(--muted)' }}>TIPO DE BLOQUEIO</label>
+                                                <select className="input-field" value={form.tipo} onChange={e => setForm({...form, tipo: e.target.value})}>
+                                                    <option value="horario">Por Horário (ex: Almoço)</option>
+                                                    <option value="dia">Dias (ex: Folga/Férias)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        {form.tipo === 'horario' ? (
+                                            <>
+                                                <div><label style={{ fontSize: 11, color: 'var(--muted)' }}>DATA</label><input type="date" className="input-field" value={form.data} onChange={e => setForm({...form, data: e.target.value})} /></div>
+                                                <div style={{ display: 'flex', gap: 12 }}>
+                                                    <div style={{ flex: 1 }}>
+                                                        <label style={{ fontSize: 11, color: 'var(--muted)' }}>INÍCIO</label>
+                                                        <select className="input-field" value={form.horarioInicio} onChange={e => setForm({...form, horarioInicio: e.target.value})}>
+                                                            {ALL_SLOTS.map(s => <option key={s} value={s}>{s}</option>)}
+                                                        </select>
+                                                    </div>
+                                                    <div style={{ flex: 1 }}>
+                                                        <label style={{ fontSize: 11, color: 'var(--muted)' }}>FIM</label>
+                                                        <select className="input-field" value={form.horarioFim} onChange={e => setForm({...form, horarioFim: e.target.value})}>
+                                                            {ALL_SLOTS.map(s => <option key={s} value={s}>{s}</option>)}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div style={{ display: 'flex', gap: 12 }}>
+                                                <div style={{ flex: 1 }}><label style={{ fontSize: 11, color: 'var(--muted)' }}>DATA INÍCIO</label><input type="date" className="input-field" value={form.dataInicio} onChange={e => setForm({...form, dataInicio: e.target.value})} /></div>
+                                                <div style={{ flex: 1 }}><label style={{ fontSize: 11, color: 'var(--muted)' }}>DATA FIM</label><input type="date" className="input-field" value={form.dataFim} onChange={e => setForm({...form, dataFim: e.target.value})} /></div>
+                                            </div>
+                                        )}
+
+                                        <div><label style={{ fontSize: 11, color: 'var(--muted)' }}>MOTIVO</label><input className="input-field" placeholder="Ex: Almoço, Férias, Médico" value={form.motivo} onChange={e => setForm({...form, motivo: e.target.value})} /></div>
+                                    </div>
+                                    <div style={{ display:'flex', gap:8 }}>
+                                        <button onClick={() => setModal(null)} className="btn-outline">Cancelar</button>
+                                        <button onClick={saveBlock} className="btn-primary" disabled={(form.tipo === 'horario' && (!form.data || form.horarioFim <= form.horarioInicio)) || (form.tipo === 'dia' && (!form.dataInicio || form.dataFim < form.dataInicio))}>
+                                            Confirmar Bloqueio
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                );
+            };
+
+            // 3. FINANCEIRO (Apenas Admin)
+            const Financeiro = () => {
+                const [despesas, setDespesas] = useState(db.despesas || []);
+                
+                const addDespesa = (e) => {
+                    e.preventDefault();
+                    const nova = { id: Date.now(), descricao: e.target.desc.value, valor: parseFloat(e.target.valor.value), data: new Date().toISOString().split('T')[0] };
+                    const atualizadas = [...despesas, nova];
+                    setDespesas(atualizadas); saveDb({ ...db, despesas: atualizadas });
+                    e.target.reset();
+                };
+
+                const delDespesa = (id) => {
+                    const atualizadas = despesas.filter(d => d.id !== id);
+                    setDespesas(atualizadas); saveDb({ ...db, despesas: atualizadas });
+                };
+
+                return (
+                    <div className="fade-in" style={{ padding: 20, paddingBottom: 100 }}>
+                        <h2 className="serif" style={{ fontSize: 28, marginBottom: 20 }}>Despesas Fixas</h2>
+                        <form className="glass" onSubmit={addDespesa} style={{ display: 'flex', gap: 8, alignItems: 'flex-end', marginBottom: 20 }}>
+                            <div style={{ flex: 2 }}><label style={{ fontSize: 10, color: 'var(--muted)', textTransform:'uppercase' }}>Descrição</label><input name="desc" required className="input-field" placeholder="Ex: Aluguel, Luz..." /></div>
+                            <div style={{ flex: 1 }}><label style={{ fontSize: 10, color: 'var(--muted)', textTransform:'uppercase' }}>Valor (R$)</label><input name="valor" type="number" step="0.01" required className="input-field" placeholder="0.00" /></div>
+                            <button type="submit" className="btn-primary" style={{ width: 'auto', padding: '12px' }}><Icon name="plus" size={18} /></button>
+                        </form>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {despesas.length === 0 && <p style={{ color: 'var(--muted)', fontSize: 13 }}>Nenhuma despesa registrada.</p>}
+                            {despesas.map(d => (
+                                <div key={d.id} className="glass" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', margin: 0 }}>
+                                    <div><p style={{ fontWeight: 600, fontSize: 14 }}>{d.descricao}</p><p style={{ fontSize: 11, color: 'var(--muted)' }}>{new Date(d.data+'T12:00').toLocaleDateString('pt-BR')}</p></div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}><p style={{ color: 'var(--danger)', fontWeight: 700 }}>R$ {d.valor.toFixed(2)}</p><button onClick={() => delDespesa(d.id)} style={{ background: 'none', border: 'none', color: 'var(--muted)' }}><Icon name="trash" size={16}/></button></div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            };
+
+            // 4. CATÁLOGO (Apenas Admin)
+            const Catalogo = () => {
+                const [catTab, setCatTab] = useState('produtos');
+                const list = catTab === 'produtos' ? db.produtos : db.servicos;
+
+                const salvarCatalogo = () => {
+                    const updatedItem = { ...form, preco: parseFloat(form.preco) || 0 };
+                    const newDb = { ...db };
+                    if (modal.type === 'produtos') {
+                        updatedItem.estoque = parseInt(form.estoque) || 0;
+                        if (modal.isEdit) newDb.produtos = newDb.produtos.map(p => p.id === updatedItem.id ? updatedItem : p);
+                        else newDb.produtos.push(updatedItem);
+                    } else {
+                        if (modal.isEdit) newDb.servicos = newDb.servicos.map(s => s.id === updatedItem.id ? updatedItem : s);
+                        else newDb.servicos.push(updatedItem);
+                    }
+                    saveDb(newDb); setModal(null);
+                };
+
+                const deletarCat = (id) => {
+                    if(!confirm("Remover do sistema?")) return;
+                    const newDb = { ...db };
+                    if (catTab === 'produtos') newDb.produtos = newDb.produtos.filter(p => p.id !== id);
+                    else newDb.servicos = newDb.servicos.filter(s => s.id !== id);
+                    saveDb(newDb);
+                };
+
+                return (
+                    <div className="fade-in" style={{ padding: 20, paddingBottom: 100 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                            <h2 className="serif" style={{ fontSize: 28 }}>Catálogo</h2>
+                            <button onClick={() => { setForm({ id: Date.now(), nome: '', preco: '', categoria: '', img: '', estoque: 0, duracao: '', group: '' }); setModal({ type: catTab, isEdit: false }); }} className="btn-primary" style={{ width: 'auto', padding: '8px 16px' }}>+ Novo</button>
+                        </div>
+                        <div style={{ display: 'flex', marginBottom: 16, borderBottom: '1px solid var(--border)' }}>
+                            <div className={`tab-btn ${catTab === 'produtos' ? 'active' : ''}`} onClick={() => setCatTab('produtos')}>Produtos</div>
+                            <div className={`tab-btn ${catTab === 'servicos' ? 'active' : ''}`} onClick={() => setCatTab('servicos')}>Serviços</div>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {list.map(item => (
+                                <div key={item.id} className="glass" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, margin: 0 }}>
+                                    <div style={{ flex: 1 }}>
+                                        <p style={{ fontWeight: 600, fontSize: 14 }}>{item.nome}</p>
+                                        <p style={{ fontSize: 12, color: 'var(--gold)' }}>R$ {parseFloat(item.preco).toFixed(2)} {catTab === 'produtos' ? ` • Estoque: ${item.estoque || 0}` : ` • ${item.duracao || ''}`}</p>
+                                    </div>
+                                    <button onClick={() => { setForm({...item}); setModal({ type: catTab, isEdit: true }); }} style={{ background: 'none', border: '1px solid var(--border)', color: 'var(--text)', padding: '6px 12px', borderRadius: 6, cursor: 'pointer', fontSize: 11 }}>Editar</button>
+                                    <button onClick={() => deletarCat(item.id)} className="btn-danger">X</button>
+                                </div>
+                            ))}
+                        </div>
+
+                        {modal && (modal.type === 'produtos' || modal.type === 'servicos') && (
+                            <div className="modal-overlay">
+                                <div className="modal-content">
+                                    <h3 className="serif" style={{ fontSize: 22, marginBottom: 16 }}>{modal.isEdit ? 'Editar' : 'Novo'} {modal.type === 'produtos' ? 'Produto' : 'Serviço'}</h3>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
+                                        <div><label style={{ fontSize: 11, color: 'var(--muted)' }}>NOME</label><input className="input-field" value={form.nome} onChange={e => setForm({...form, nome: e.target.value})} /></div>
+                                        <div style={{ display: 'flex', gap: 12 }}>
+                                            <div style={{ flex: 1 }}><label style={{ fontSize: 11, color: 'var(--muted)' }}>PREÇO (R$)</label><input type="number" step="0.01" className="input-field" value={form.preco} onChange={e => setForm({...form, preco: e.target.value})} /></div>
+                                            {modal.type === 'produtos' ? (
+                                                <div style={{ flex: 1 }}><label style={{ fontSize: 11, color: 'var(--muted)' }}>ESTOQUE</label><input type="number" className="input-field" value={form.estoque} onChange={e => setForm({...form, estoque: e.target.value})} /></div>
+                                            ) : (
+                                                <div style={{ flex: 1 }}><label style={{ fontSize: 11, color: 'var(--muted)' }}>DURAÇÃO</label><input className="input-field" value={form.duracao} onChange={e => setForm({...form, duracao: e.target.value})} /></div>
+                                            )}
+                                        </div>
+                                        <div><label style={{ fontSize: 11, color: 'var(--muted)' }}>CATEGORIA / GRUPO</label><input className="input-field" value={modal.type === 'produtos' ? form.categoria : form.group} onChange={e => modal.type === 'produtos' ? setForm({...form, categoria: e.target.value}) : setForm({...form, group: e.target.value})} /></div>
+                                    </div>
+                                    <div style={{ display:'flex', gap:8 }}>
+                                        <button onClick={() => setModal(null)} className="btn-outline">Cancelar</button>
+                                        <button onClick={salvarCatalogo} className="btn-primary" disabled={!form.nome || !form.preco}>Salvar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                );
+            };
+
+            // 5. EQUIPE (Apenas Admin)
+            const Equipe = () => {
+                const salvarBarbeiro = () => {
+                    const updated = { ...form, comissao: parseFloat(form.comissao) || 0 };
+                    const newDb = { ...db };
+                    if (modal.isEdit) newDb.barbeiros = newDb.barbeiros.map(b => b.id === updated.id ? updated : b);
+                    else newDb.barbeiros.push(updated);
+                    saveDb(newDb); setModal(null);
+                };
+
+                return (
+                    <div className="fade-in" style={{ padding: 20, paddingBottom: 100 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                            <h2 className="serif" style={{ fontSize: 28 }}>Equipe</h2>
+                            <button onClick={() => { setForm({ id: Date.now(), nome: '', login: '', senha: '', comissao: 50, especialidade: '', telefone: '' }); setModal({ type: 'equipe', isEdit: false }); }} className="btn-primary" style={{ width: 'auto', padding: '8px 16px' }}>+ Novo</button>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                            {db.barbeiros.map(b => (
+                                <div key={b.id} className="glass" style={{ margin: 0 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                                        <div><p style={{ fontWeight: 700, fontSize: 16 }}>{b.nome}</p><p style={{ fontSize: 12, color: 'var(--muted)' }}>Login: {b.login}</p></div>
+                                        <div style={{ background: 'var(--gold-dim)', color: 'var(--gold)', padding: '4px 12px', borderRadius: 100, fontSize: 12, fontWeight: 700 }}>{b.comissao}%</div>
+                                    </div>
+                                    <button onClick={() => { setForm({...b}); setModal({ type: 'equipe', isEdit: true }); }} className="btn-outline" style={{ padding: '8px' }}>Editar Perfil / Comissão</button>
+                                </div>
+                            ))}
+                        </div>
+
+                        {modal && modal.type === 'equipe' && (
+                            <div className="modal-overlay">
+                                <div className="modal-content">
+                                    <h3 className="serif" style={{ fontSize: 22, marginBottom: 16 }}>{modal.isEdit ? 'Editar' : 'Novo'} Profissional</h3>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
+                                        <div><label style={{ fontSize: 11, color: 'var(--muted)' }}>NOME</label><input className="input-field" value={form.nome} onChange={e => setForm({...form, nome: e.target.value})} /></div>
+                                        <div style={{ display: 'flex', gap: 12 }}>
+                                            <div style={{ flex: 2 }}><label style={{ fontSize: 11, color: 'var(--muted)' }}>LOGIN DE ACESSO</label><input className="input-field" value={form.login} onChange={e => setForm({...form, login: e.target.value})} /></div>
+                                            <div style={{ flex: 2 }}><label style={{ fontSize: 11, color: 'var(--muted)' }}>SENHA</label><input type="password" className="input-field" value={form.senha} onChange={e => setForm({...form, senha: e.target.value})} /></div>
+                                        </div>
+                                        <div><label style={{ fontSize: 11, color: 'var(--muted)' }}>COMISSÃO (%)</label><input type="number" className="input-field" value={form.comissao} onChange={e => setForm({...form, comissao: e.target.value})} /></div>
+                                    </div>
+                                    <div style={{ display:'flex', gap:8 }}>
+                                        <button onClick={() => setModal(null)} className="btn-outline">Cancelar</button>
+                                        <button onClick={salvarBarbeiro} className="btn-primary" disabled={!form.nome || !form.login}>Salvar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                );
+            };
 
             return (
-                <div className="flex flex-col md:flex-row h-full w-full relative">
-                    {/* Header Mobile */}
-                    <header className="md:hidden bg-[#0a0a0a] border-b border-white/10 p-4 flex justify-between items-center z-40 shadow-md">
-                        <div><h1 className="text-xl font-serif text-white tracking-widest leading-none">VICTORINO</h1></div>
-                        <button onClick={carregarDados} className="bg-white/10 active:bg-vic-gold text-white px-3 py-2 rounded text-xs font-bold transition">🔄 Atualizar</button>
-                    </header>
-
-                    {/* Sidebar Desktop */}
-                    <aside className="hidden md:flex w-64 bg-[#0a0a0a] border-r border-white/10 flex-col z-10 shadow-2xl">
-                        <div className="p-6 border-b border-white/10 text-center">
-                            <h1 className="text-xl font-serif text-white tracking-widest leading-none">VICTORINO</h1>
-                            <p className="text-[10px] text-vic-gold uppercase tracking-[0.3em] mt-1">Admin Panel</p>
+                <div className="main-wrap">
+                    <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, background: 'rgba(5,5,5,0.95)', backdropFilter: 'blur(10px)', zIndex: 50 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                            <div style={{ width: 32, height: 32, background: 'var(--gold)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontWeight: 'bold' }}>V</div>
+                            <div><h1 className="serif" style={{ fontSize: 18, lineHeight: 1 }}>{user.role === 'admin' ? 'Admin Geral' : 'Portal do Barbeiro'}</h1><p style={{ fontSize: 10, color: 'var(--gold)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{user.nome}</p></div>
                         </div>
-                        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-                            <button onClick={() => setActiveTab('dashboard')} className={`w-full text-left px-4 py-3 rounded uppercase text-xs tracking-widest font-bold transition ${activeTab === 'dashboard' ? 'bg-vic-gold text-black' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>📊 Dashboard</button>
-                            <button onClick={() => setActiveTab('agenda')} className={`w-full text-left px-4 py-3 rounded uppercase text-xs tracking-widest font-bold transition ${activeTab === 'agenda' ? 'bg-vic-gold text-black' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>📅 Agenda Geral</button>
-                            <button onClick={() => setActiveTab('financeiro')} className={`w-full text-left px-4 py-3 rounded uppercase text-xs tracking-widest font-bold transition ${activeTab === 'financeiro' ? 'bg-vic-gold text-black' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>💰 Financeiro</button>
-                            <button onClick={() => setActiveTab('estoque')} className={`w-full text-left px-4 py-3 rounded uppercase text-xs tracking-widest font-bold transition ${activeTab === 'estoque' ? 'bg-vic-gold text-black' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>📦 Estoque</button>
-                            <button onClick={() => setActiveTab('servicos')} className={`w-full text-left px-4 py-3 rounded uppercase text-xs tracking-widest font-bold transition ${activeTab === 'servicos' ? 'bg-vic-gold text-black' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>💈 Catálogo Serviços</button>
-                            <button onClick={() => setActiveTab('crm')} className={`w-full text-left px-4 py-3 rounded uppercase text-xs tracking-widest font-bold transition ${activeTab === 'crm' ? 'bg-vic-gold text-black' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>👥 CRM Clientes</button>
-                        </nav>
-                    </aside>
+                        <button onClick={logout} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600 }}><Icon name="logout" size={18} /> Sair</button>
+                    </div>
 
-                    <main className="flex-1 bg-vic-bg p-4 md:p-8 overflow-y-auto pb-24 md:pb-8">
-                        
-                        {/* 1. DASHBOARD */}
-                        {activeTab === 'dashboard' && (
-                            <div className="animate-[fadeIn_0.3s_ease-out]">
-                                <h2 className="text-2xl md:text-3xl font-serif text-white mb-6">Painel Geral</h2>
-                                
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                                    <div className="glass p-6 rounded-lg border-l-4 border-vic-gold">
-                                        <p className="text-gray-400 text-xs uppercase tracking-widest">Saldo Líquido</p>
-                                        <h3 className={`text-3xl font-serif mt-2 ${saldoLiquido >= 0 ? 'text-white' : 'text-red-400'}`}>R$ {saldoLiquido.toFixed(2)}</h3>
-                                    </div>
-                                    <div className="glass p-6 rounded-lg border-l-4 border-blue-500">
-                                        <p className="text-gray-400 text-xs uppercase tracking-widest">Serviços Concluídos</p>
-                                        <h3 className="text-3xl font-serif text-white mt-2">R$ {faturamentoServicos.toFixed(2)}</h3>
-                                    </div>
-                                    <div className="glass p-6 rounded-lg border-l-4 border-green-500">
-                                        <p className="text-gray-400 text-xs uppercase tracking-widest">Loja / Produtos</p>
-                                        <h3 className="text-3xl font-serif text-white mt-2">R$ {faturamentoVendas.toFixed(2)}</h3>
-                                    </div>
-                                    <div className="glass p-6 rounded-lg border-l-4 border-red-800">
-                                        <p className="text-gray-400 text-xs uppercase tracking-widest">Despesas</p>
-                                        <h3 className="text-3xl font-serif text-white mt-2">R$ {totalDespesas.toFixed(2)}</h3>
-                                    </div>
-                                </div>
+                    {view === 'dashboard' && <Dashboard />}
+                    {view === 'agenda' && <Agenda />}
+                    {view === 'financeiro' && user.role === 'admin' && <Financeiro />}
+                    {view === 'catalogo' && user.role === 'admin' && <Catalogo />}
+                    {view === 'equipe' && user.role === 'admin' && <Equipe />}
 
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                    <div className="glass p-6 rounded-lg">
-                                        <h3 className="text-lg font-serif text-vic-gold mb-4">Agendamentos Recentes</h3>
-                                        <div className="space-y-3">
-                                            {agendamentos.slice(-5).reverse().map(a => (
-                                                <div key={a.id} className="bg-black/40 p-3 rounded border border-white/5 flex justify-between items-center">
-                                                    <div>
-                                                        <p className="text-white font-bold text-sm">{a.clientName}</p>
-                                                        <p className="text-xs text-gray-400">{a.serviceName} • {a.date} às {a.time}</p>
-                                                    </div>
-                                                    <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded ${a.status === 'concluido' ? 'bg-green-900/50 text-green-400' : a.status === 'cancelado' ? 'bg-red-900/50 text-red-400' : 'bg-yellow-900/50 text-yellow-400'}`}>
-                                                        {a.status || 'pendente'}
-                                                    </span>
-                                                </div>
-                                            ))}
-                                            {agendamentos.length === 0 && <p className="text-gray-500 text-sm">Nenhum agendamento registrado.</p>}
-                                        </div>
-                                    </div>
-                                    <div className="glass p-6 rounded-lg">
-                                        <h3 className="text-lg font-serif text-vic-gold mb-4">Avisos de Estoque</h3>
-                                        <div className="space-y-3">
-                                            {estoque.filter(item => item.quantidade <= 3).map(item => (
-                                                <div key={item.id} className="bg-red-900/20 p-3 rounded border border-red-900/50 flex justify-between items-center">
-                                                    <span className="text-white text-sm">⚠️ {item.nome}</span>
-                                                    <span className="text-red-400 font-bold text-sm">{item.quantidade} restam</span>
-                                                </div>
-                                            ))}
-                                            {estoque.filter(item => item.quantidade <= 3).length === 0 && <p className="text-gray-500 text-sm">Estoque saudável. Tudo sob controle.</p>}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    <div className="nav-sidebar">
+                        <div className={`nav-item ${view === 'dashboard' ? 'active' : ''}`} onClick={() => setView('dashboard')}><Icon n="dashboard" /> Resumo</div>
+                        <div className={`nav-item ${view === 'agenda' ? 'active' : ''}`} onClick={() => setView('agenda')}><Icon n="list" /> Agenda</div>
+                        {user.role === 'admin' && (
+                            <>
+                                <div className={`nav-item ${view === 'financeiro' ? 'active' : ''}`} onClick={() => setView('financeiro')}><Icon n="dollar" /> Finanças</div>
+                                <div className={`nav-item ${view === 'catalogo' ? 'active' : ''}`} onClick={() => setView('catalogo')}><Icon n="box" /> Catálogo</div>
+                                <div className={`nav-item ${view === 'equipe' ? 'active' : ''}`} onClick={() => setView('equipe')}><Icon n="users" /> Equipe</div>
+                            </>
                         )}
-
-                        {/* 2. AGENDA GERAL */}
-                        {activeTab === 'agenda' && (
-                            <div className="animate-[fadeIn_0.3s_ease-out]">
-                                <h2 className="text-2xl md:text-3xl font-serif text-white mb-6">Agenda Geral</h2>
-                                <div className="glass rounded-lg overflow-hidden">
-                                    <div className="overflow-x-auto">
-                                        <table className="w-full text-left text-sm">
-                                            <thead className="bg-white/5 text-vic-gold uppercase tracking-wider text-[10px]">
-                                                <tr>
-                                                    <th className="p-4">Data/Hora</th>
-                                                    <th className="p-4">Cliente</th>
-                                                    <th className="p-4">Serviço</th>
-                                                    <th className="p-4">Profissional</th>
-                                                    <th className="p-4">Valor</th>
-                                                    <th className="p-4 text-center">Status / Ação</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-white/5 text-gray-300">
-                                                {agendamentos.sort((a,b) => new Date(`${b.date}T${b.time}`) - new Date(`${a.date}T${a.time}`)).map(a => (
-                                                    <tr key={a.id} className="hover:bg-white/5 transition">
-                                                        <td className="p-4 font-bold text-white whitespace-nowrap">{new Date(a.date+'T12:00').toLocaleDateString('pt-BR')} <br/><span className="text-vic-gold text-xs">{a.time}</span></td>
-                                                        <td className="p-4 whitespace-nowrap">{a.clientName}<br/><span className="text-xs text-gray-500">{a.clientPhone}</span></td>
-                                                        <td className="p-4">{a.serviceName}</td>
-                                                        <td className="p-4">{a.barberName}</td>
-                                                        <td className="p-4 text-vic-green font-bold">R$ {a.totalPrice?.toFixed(2)}</td>
-                                                        <td className="p-4">
-                                                            <div className="flex flex-col gap-1 items-center">
-                                                                <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded w-full text-center ${a.status === 'concluido' ? 'bg-green-900/50 text-green-400' : a.status === 'cancelado' ? 'bg-red-900/50 text-red-400' : 'bg-yellow-900/50 text-yellow-400'}`}>
-                                                                    {a.status || 'pendente'}
-                                                                </span>
-                                                                {(!a.status || a.status === 'pendente') && (
-                                                                    <div className="flex gap-1 w-full mt-1">
-                                                                        <button onClick={() => mudarStatusAgendamento(a.id, 'concluido')} className="flex-1 bg-vic-green hover:bg-green-600 text-white text-[10px] py-1 rounded">✔</button>
-                                                                        <button onClick={() => mudarStatusAgendamento(a.id, 'cancelado')} className="flex-1 bg-vic-red hover:bg-red-600 text-white text-[10px] py-1 rounded">✖</button>
-                                                                    </div>
-                                                                )}
-                                                                <button onClick={() => excluirAgendamento(a.id)} className="text-gray-500 hover:text-white text-[10px] underline mt-1">Excluir</button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                                {agendamentos.length === 0 && <tr><td colSpan="6" className="p-8 text-center text-gray-500">Nenhum agendamento encontrado.</td></tr>}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* 3. FINANCEIRO */}
-                        {activeTab === 'financeiro' && (
-                            <div className="animate-[fadeIn_0.3s_ease-out]">
-                                <h2 className="text-2xl md:text-3xl font-serif text-white mb-6">Fluxo de Caixa</h2>
-                                
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                    {/* Lançar Despesa */}
-                                    <div className="glass p-6 rounded-lg h-fit border-t-4 border-red-800">
-                                        <h3 className="text-lg font-serif text-white mb-4">Lançar Saída/Despesa</h3>
-                                        <form onSubmit={adicionarDespesa} className="space-y-4">
-                                            <div>
-                                                <label className="text-[10px] text-gray-400 uppercase tracking-widest mb-1 block">Descrição (Ex: Conta de Luz)</label>
-                                                <input type="text" required value={formDespesa.descricao} onChange={e => setFormDespesa({...formDespesa, descricao: e.target.value})} className="input-vic text-sm" />
-                                            </div>
-                                            <div>
-                                                <label className="text-[10px] text-gray-400 uppercase tracking-widest mb-1 block">Valor (R$)</label>
-                                                <input type="number" step="0.01" required value={formDespesa.valor} onChange={e => setFormDespesa({...formDespesa, valor: e.target.value})} className="input-vic text-sm" />
-                                            </div>
-                                            <button type="submit" className="w-full bg-red-900 hover:bg-red-800 text-white font-bold uppercase tracking-widest text-xs py-3 rounded transition">Registrar Despesa</button>
-                                        </form>
-                                    </div>
-
-                                    {/* Histórico */}
-                                    <div className="lg:col-span-2 space-y-6">
-                                        <div className="glass rounded-lg p-6">
-                                            <h3 className="text-lg font-serif text-vic-gold mb-4">Extrato de Despesas</h3>
-                                            <div className="space-y-2">
-                                                {despesas.map(d => (
-                                                    <div key={d.id} className="bg-black/40 p-3 rounded flex justify-between items-center border border-red-900/30">
-                                                        <div>
-                                                            <p className="text-white font-bold text-sm">{d.descricao}</p>
-                                                            <p className="text-xs text-gray-500">{d.data}</p>
-                                                        </div>
-                                                        <div className="flex items-center gap-4">
-                                                            <span className="text-red-400 font-bold">- R$ {d.valor.toFixed(2)}</span>
-                                                            <button onClick={() => excluirDespesa(d.id)} className="text-gray-500 hover:text-white">🗑️</button>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                                {despesas.length === 0 && <p className="text-gray-500 text-sm">Nenhuma despesa registrada.</p>}
-                                            </div>
-                                        </div>
-
-                                        <div className="glass rounded-lg p-6 border-t-4 border-green-800">
-                                            <h3 className="text-lg font-serif text-vic-gold mb-4">Vendas da Loja Online</h3>
-                                            <p className="text-xs text-gray-400 mb-4">Os pedidos feitos pelo cliente via App caem aqui.</p>
-                                            <div className="space-y-2">
-                                                {vendas.map(v => (
-                                                    <div key={v.id} className="bg-black/40 p-3 rounded flex justify-between items-center border border-green-900/30">
-                                                        <div>
-                                                            <p className="text-white font-bold text-sm">{v.description}</p>
-                                                            <p className="text-xs text-gray-500">{v.date} às {v.time} • Status: {v.method}</p>
-                                                        </div>
-                                                        <span className="text-vic-green font-bold">+ R$ {v.price.toFixed(2)}</span>
-                                                    </div>
-                                                ))}
-                                                {vendas.length === 0 && <p className="text-gray-500 text-sm">Nenhuma venda de loja registrada.</p>}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* 4. ESTOQUE */}
-                        {activeTab === 'estoque' && (
-                            <div className="animate-[fadeIn_0.3s_ease-out]">
-                                <h2 className="text-2xl md:text-3xl font-serif text-white mb-6">Controle de Estoque</h2>
-                                
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                    <div className="glass p-6 rounded-lg h-fit">
-                                        <h3 className="text-lg font-serif text-vic-gold mb-4">{formEstoque.id ? '✏️ Editar Produto' : '➕ Novo Produto'}</h3>
-                                        <form onSubmit={salvarEstoque} className="space-y-4">
-                                            <div>
-                                                <label className="text-[10px] text-gray-400 uppercase tracking-widest mb-1 block">Nome do Produto</label>
-                                                <input type="text" required value={formEstoque.nome} onChange={e => setFormEstoque({...formEstoque, nome: e.target.value})} className="input-vic text-sm" />
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-3">
-                                                <div>
-                                                    <label className="text-[10px] text-gray-400 uppercase tracking-widest mb-1 block">Custo (R$)</label>
-                                                    <input type="number" step="0.01" value={formEstoque.custo} onChange={e => setFormEstoque({...formEstoque, custo: e.target.value})} className="input-vic text-sm" />
-                                                </div>
-                                                <div>
-                                                    <label className="text-[10px] text-gray-400 uppercase tracking-widest mb-1 block">Venda (R$)</label>
-                                                    <input type="number" step="0.01" required value={formEstoque.preco} onChange={e => setFormEstoque({...formEstoque, preco: e.target.value})} className="input-vic text-sm" />
-                                                </div>
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-3">
-                                                <div>
-                                                    <label className="text-[10px] text-gray-400 uppercase tracking-widest mb-1 block">Quantidade Atual</label>
-                                                    <input type="number" required value={formEstoque.quantidade} onChange={e => setFormEstoque({...formEstoque, quantidade: e.target.value})} className="input-vic text-sm" />
-                                                </div>
-                                                <div>
-                                                    <label className="text-[10px] text-gray-400 uppercase tracking-widest mb-1 block">Categoria</label>
-                                                    <select value={formEstoque.categoria} onChange={e => setFormEstoque({...formEstoque, categoria: e.target.value})} className="input-vic text-sm">
-                                                        <option value="Produtos de Cabelo">Cabelo</option>
-                                                        <option value="Perfumes">Perfumes</option>
-                                                        <option value="Camisas de Times">Camisas</option>
-                                                        <option value="Bebidas">Bebidas</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div className="flex gap-2 mt-2">
-                                                <button type="submit" className="flex-1 bg-vic-gold text-black font-bold uppercase text-xs py-3 rounded">Salvar</button>
-                                                {formEstoque.id && <button type="button" onClick={() => setFormEstoque({id:null,nome:'',preco:'',custo:'',quantidade:'',categoria:'Produtos de Cabelo'})} className="flex-1 border border-white/20 text-white font-bold uppercase text-xs py-3 rounded">Cancelar</button>}
-                                            </div>
-                                        </form>
-                                    </div>
-
-                                    <div className="lg:col-span-2">
-                                        <div className="glass rounded-lg overflow-hidden">
-                                            <table className="w-full text-left text-sm">
-                                                <thead className="bg-white/5 text-vic-gold uppercase tracking-wider text-[10px]">
-                                                    <tr>
-                                                        <th className="p-4">Produto</th>
-                                                        <th className="p-4 text-center">Estoque</th>
-                                                        <th className="p-4">Preço Venda</th>
-                                                        <th className="p-4 text-right">Ações</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className="divide-y divide-white/5">
-                                                    {estoque.map(item => (
-                                                        <tr key={item.id} className="hover:bg-white/5 transition">
-                                                            <td className="p-4"><p className="text-white font-bold">{item.nome}</p><p className="text-xs text-gray-500">{item.categoria}</p></td>
-                                                            <td className="p-4">
-                                                                <div className="flex items-center justify-center gap-3">
-                                                                    <button onClick={() => alterarQtd(item.id, -1)} className="bg-white/10 w-6 h-6 rounded flex items-center justify-center text-white hover:bg-vic-gold hover:text-black">-</button>
-                                                                    <span className={`font-bold ${item.quantidade <= 3 ? 'text-red-400' : 'text-white'}`}>{item.quantidade}</span>
-                                                                    <button onClick={() => alterarQtd(item.id, 1)} className="bg-white/10 w-6 h-6 rounded flex items-center justify-center text-white hover:bg-vic-gold hover:text-black">+</button>
-                                                                </div>
-                                                            </td>
-                                                            <td className="p-4 text-vic-green font-bold">R$ {item.preco.toFixed(2)}</td>
-                                                            <td className="p-4 text-right">
-                                                                <button onClick={() => setFormEstoque(item)} className="text-gray-400 hover:text-vic-gold mr-3">✏️</button>
-                                                                <button onClick={() => {if(confirm('Excluir produto?')) setEstoque(estoque.filter(e => e.id !== item.id))}} className="text-gray-400 hover:text-red-500">🗑️</button>
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                    {estoque.length === 0 && <tr><td colSpan="4" className="p-8 text-center text-gray-500">Nenhum produto em estoque.</td></tr>}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* 5. CRM CLIENTES */}
-                        {activeTab === 'crm' && (
-                            <div className="animate-[fadeIn_0.3s_ease-out]">
-                                <h2 className="text-2xl md:text-3xl font-serif text-white mb-6">CRM - Fidelidade Clientes</h2>
-                                <div className="glass rounded-lg overflow-hidden p-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        {Object.values(clientesCRM).sort((a,b) => b.visitas - a.visitas).map((cli, index) => (
-                                            <div key={index} className="bg-black/40 border border-white/5 p-4 rounded-lg flex items-start gap-4 hover:border-vic-gold transition">
-                                                <div className="w-12 h-12 bg-vic-gold/10 rounded-full flex items-center justify-center text-vic-gold font-serif text-xl font-bold">
-                                                    {cli.nome.charAt(0).toUpperCase()}
-                                                </div>
-                                                <div className="flex-1">
-                                                    <h3 className="text-white font-bold">{cli.nome}</h3>
-                                                    <p className="text-xs text-gray-400 mb-2">{cli.telefone}</p>
-                                                    <div className="flex justify-between text-xs">
-                                                        <span className="text-vic-gold bg-vic-gold/10 px-2 py-1 rounded">{cli.visitas} Visitas Concluídas</span>
-                                                    </div>
-                                                    <p className="text-[10px] text-gray-500 mt-2">Gasto Est.: <span className="text-vic-green font-bold">R$ {cli.gastoTotal.toFixed(2)}</span></p>
-                                                    <p className="text-[10px] text-gray-500">Última Visita: {new Date(cli.ultimaVisita+'T12:00').toLocaleDateString('pt-BR')}</p>
-                                                </div>
-                                            </div>
-                                        ))}
-                                        {Object.keys(clientesCRM).length === 0 && <p className="text-gray-500 col-span-3 text-center py-8">Nenhum dado de cliente para exibir ainda.</p>}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* 6. CATÁLOGO SERVIÇOS E PLANOS VIP */}
-                        {activeTab === 'servicos' && (
-                            <div className="animate-[fadeIn_0.3s_ease-out]">
-                                <h2 className="text-2xl md:text-3xl font-serif text-white mb-2">Catálogo & Planos VIP</h2>
-                                <p className="text-gray-500 text-xs md:text-sm mb-6">Gerencie seus serviços, preços e assinaturas exclusivas.</p>
-
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                                    {/* Formulário Lateral */}
-                                    <div className="glass p-6 rounded-lg lg:col-span-1 h-fit sticky top-4 border-t-4 border-vic-gold">
-                                        <h3 className="text-lg font-serif text-white mb-6 flex items-center gap-2">
-                                            {formServico.id ? '✏️ Editar Item' : '➕ Novo Item'}
-                                        </h3>
-                                        <form onSubmit={salvarServico} className="space-y-5">
-                                            <div>
-                                                <label className="text-[10px] text-vic-gold uppercase tracking-widest mb-1 block">Nome do Serviço / Plano</label>
-                                                <input type="text" required value={formServico.nome} onChange={e => setFormServico({...formServico, nome: e.target.value})} className="input-vic text-sm" placeholder="Ex: Pigmentação ou Plano Premium" />
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <label className="text-[10px] text-vic-gold uppercase tracking-widest mb-1 block">Preço (R$)</label>
-                                                    <input type="number" step="0.01" required value={formServico.preco} onChange={e => setFormServico({...formServico, preco: e.target.value})} className="input-vic text-sm" placeholder="40.00" />
-                                                </div>
-                                                <div>
-                                                    <label className="text-[10px] text-vic-gold uppercase tracking-widest mb-1 block">Duração / Ciclo</label>
-                                                    <input type="text" required value={formServico.duracao} onChange={e => setFormServico({...formServico, duracao: e.target.value})} className="input-vic text-sm" placeholder="Ex: 30 min ou Mensal" />
-                                                </div>
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <label className="text-[10px] text-vic-gold uppercase tracking-widest mb-1 block">Categoria</label>
-                                                    <select required value={formServico.group} onChange={e => setFormServico({...formServico, group: e.target.value})} className="input-vic text-sm appearance-none bg-vic-card">
-                                                        <option value="Cortes e Cabelo">Cortes e Cabelo</option>
-                                                        <option value="Barba e Detalhes">Barba e Detalhes</option>
-                                                        <option value="Química e Cor">Química e Cor</option>
-                                                        <option value="Estética">Estética/Limpeza</option>
-                                                        {/* NOVA OPÇÃO: Planos VIP */}
-                                                        <option value="Planos VIP">Planos VIP</option>
-                                                    </select>
-                                                </div>
-                                                <div>
-                                                    <label className="text-[10px] text-vic-gold uppercase tracking-widest mb-1 block">Ícone Visual</label>
-                                                    <select required value={formServico.icon} onChange={e => setFormServico({...formServico, icon: e.target.value})} className="input-vic text-sm appearance-none text-xl bg-vic-card">
-                                                        <option value="✂️">✂️ Tesoura</option><option value="⚡">⚡ Máquina</option>
-                                                        <option value="🪒">🪒 Navalha</option><option value="🎨">🎨 Tinta</option>
-                                                        <option value="❄️">❄️ Floco</option><option value="✨">✨ Brilho</option>
-                                                        <option value="🧒">🧒 Infantil</option><option value="👁️">👁️ Olho</option>
-                                                        {/* NOVO ÍCONE */}
-                                                        <option value="👑">👑 Coroa (VIP)</option>
-                                                        <option value="⭐">⭐ Estrela</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div className="flex gap-3 pt-2">
-                                                <button type="submit" className="flex-1 bg-vic-gold hover:bg-white text-black font-bold uppercase tracking-widest text-xs py-3 rounded transition shadow-[0_0_15px_rgba(212,175,55,0.2)]">Salvar</button>
-                                                {formServico.id && <button type="button" onClick={() => setFormServico({id:null,nome:'',preco:'',duracao:'',icon:'✂️',group:'Cortes e Cabelo'})} className="flex-1 border border-white/20 text-white hover:bg-white/5 font-bold uppercase tracking-widest text-xs py-3 rounded transition">Cancelar</button>}
-                                            </div>
-                                        </form>
-                                    </div>
-
-                                    {/* Lista de Serviços (Cards Redesenhados) */}
-                                    <div className="lg:col-span-2 space-y-8">
-                                        {Object.keys(servicosAgrupados).map(grupo => (
-                                            <div key={grupo} className="animate-[fadeIn_0.5s_ease-out]">
-                                                {/* Cabeçalho do Grupo */}
-                                                <div className="flex items-center gap-4 mb-4">
-                                                    <h3 className={`font-serif text-2xl ${grupo === 'Planos VIP' ? 'text-vic-gold' : 'text-white'}`}>{grupo}</h3>
-                                                    <div className="h-[1px] flex-1 bg-gradient-to-r from-white/20 to-transparent"></div>
-                                                </div>
-                                                
-                                                {/* Grid de Cards */}
-                                                <div className="grid grid-cols-1 gap-4">
-                                                    {servicosAgrupados[grupo].map(serv => (
-                                                        <div key={serv.id} className="bg-vic-card p-4 rounded-xl border border-white/5 hover:border-vic-gold/50 transition-all duration-300 flex flex-col sm:flex-row justify-between sm:items-center gap-4 group shadow-lg">
-                                                            
-                                                            {/* Info do Serviço */}
-                                                            <div className="flex items-center gap-4">
-                                                                <div className={`w-14 h-14 rounded-full flex justify-center items-center text-2xl shadow-inner border transition-transform group-hover:scale-110
-                                                                    ${grupo === 'Planos VIP' ? 'bg-gradient-to-br from-vic-gold/30 to-black border-vic-gold text-vic-gold' : 'bg-gradient-to-br from-white/10 to-black border-white/10 text-white'}`}>
-                                                                    {serv.icon}
-                                                                </div>
-                                                                <div>
-                                                                    <h4 className="text-white font-serif text-lg tracking-wide">{serv.nome}</h4>
-                                                                    <div className="flex flex-wrap gap-2 mt-1">
-                                                                        <span className="text-[10px] uppercase tracking-widest text-gray-400 bg-black/60 px-2 py-1 rounded-full border border-white/5">
-                                                                            ⏱ {serv.duracao}
-                                                                        </span>
-                                                                        {grupo === 'Planos VIP' && (
-                                                                            <span className="text-[10px] uppercase tracking-widest text-black font-bold bg-vic-gold px-2 py-1 rounded-full shadow-[0_0_10px_rgba(212,175,55,0.3)]">
-                                                                                VIP
-                                                                            </span>
-                                                                        )}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            
-                                                            {/* Preço e Ações */}
-                                                            <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-t-0 border-white/5 pt-4 sm:pt-0">
-                                                                <span className="text-xl font-bold text-vic-green tracking-wider whitespace-nowrap">
-                                                                    R$ {serv.preco.toFixed(2)}
-                                                                </span>
-                                                                <div className="flex gap-2">
-                                                                    <button onClick={() => setFormServico(serv)} className="bg-white/5 p-2.5 rounded hover:bg-vic-gold hover:text-black text-gray-400 transition" title="Editar Serviço">
-                                                                        ✏️
-                                                                    </button>
-                                                                    <button onClick={() => excluirServico(serv.id)} className="bg-red-900/20 p-2.5 rounded hover:bg-red-700 hover:text-white text-red-400 transition" title="Excluir Serviço">
-                                                                        🗑️
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </main>
-
-                    {/* MENU INFERIOR MOBILE */}
-                    <nav className="md:hidden fixed bottom-0 w-full bg-[#0a0a0a]/95 backdrop-blur-md border-t border-white/10 h-16 z-50 overflow-x-auto scroll-no-bar flex items-center px-2 space-x-4">
-                        <button onClick={() => setActiveTab('dashboard')} className={`flex-shrink-0 flex flex-col items-center justify-center w-16 h-full transition ${activeTab === 'dashboard' ? 'text-vic-gold' : 'text-gray-500'}`}><span className="text-lg mb-1">📊</span><span className="text-[8px] uppercase font-bold">Painel</span></button>
-                        <button onClick={() => setActiveTab('agenda')} className={`flex-shrink-0 flex flex-col items-center justify-center w-16 h-full transition ${activeTab === 'agenda' ? 'text-vic-gold' : 'text-gray-500'}`}><span className="text-lg mb-1">📅</span><span className="text-[8px] uppercase font-bold">Agenda</span></button>
-                        <button onClick={() => setActiveTab('financeiro')} className={`flex-shrink-0 flex flex-col items-center justify-center w-16 h-full transition ${activeTab === 'financeiro' ? 'text-vic-gold' : 'text-gray-500'}`}><span className="text-lg mb-1">💰</span><span className="text-[8px] uppercase font-bold">Caixa</span></button>
-                        <button onClick={() => setActiveTab('estoque')} className={`flex-shrink-0 flex flex-col items-center justify-center w-16 h-full transition ${activeTab === 'estoque' ? 'text-vic-gold' : 'text-gray-500'}`}><span className="text-lg mb-1">📦</span><span className="text-[8px] uppercase font-bold">Estoque</span></button>
-                        <button onClick={() => setActiveTab('servicos')} className={`flex-shrink-0 flex flex-col items-center justify-center w-16 h-full transition ${activeTab === 'servicos' ? 'text-vic-gold' : 'text-gray-500'}`}><span className="text-lg mb-1">💈</span><span className="text-[8px] uppercase font-bold">Serviços</span></button>
-                        <button onClick={() => setActiveTab('crm')} className={`flex-shrink-0 flex flex-col items-center justify-center w-16 h-full transition ${activeTab === 'crm' ? 'text-vic-gold' : 'text-gray-500'}`}><span className="text-lg mb-1">👥</span><span className="text-[8px] uppercase font-bold">CRM</span></button>
-                    </nav>
+                    </div>
                 </div>
             );
         };
 
         const root = ReactDOM.createRoot(document.getElementById('admin-app'));
-        root.render(<AdminApp />);
+        root.render(<App />);
     </script>
 </body>
 </html>
