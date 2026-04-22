@@ -252,13 +252,15 @@
         .hero-bg {
             position: absolute;
             inset: 0;
-            background: url('img/hero_bg.jpg') center/cover no-repeat;
+            /* Coloque o nome da sua imagem de fundo aqui em baixo */
+            background: url('img/hero_bg.jpg') center/cover no-repeat; 
         }
         .hero-bg::after {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 100%);
+            /* Reduzi a opacidade do preto para a sua foto aparecer melhor (de 0.98 para 0.8) */
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.2) 100%);
         }
 
         /* Notification */
@@ -902,7 +904,9 @@ const App = () => {
         <>
             <Notif n={notification} />
             <div className="top-bar">
-                <span className="logo-text gold-text">VICTORINO</span>
+                {/* Nova logo inserida aqui */}
+                <img src="img/VICTORINO_Vertical_colorida.png" alt="Victorino Logo" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
+                
                 <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>{tab !== 'agendar' && <button className="btn-primary" onClick={() => setTab('agendar')} style={{ padding: '8px 16px', fontSize: 11 }}>Agendar</button>}</div>
             </div>
             <div className="main-content">
