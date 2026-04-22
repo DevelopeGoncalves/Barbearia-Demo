@@ -7,42 +7,54 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #c9a84c; --gold-light: #f0d98c; --bg: #050505; --card: #111111; --border: rgba(255,255,255,0.08); --text: #e8e8e8; --muted: #888; --success: #5bdd5b; --danger: #ff5b5b; --warning: #f5a623; }
+        :root { 
+            --gold: #c9a84c; 
+            --gold-light: #f0d98c;
+            --gold-dim: rgba(201,168,76,0.15); 
+            --bg: #f4f7f6; /* Fundo cinza bem claro padrão de ERP */
+            --card: #ffffff; /* Cartões brancos */
+            --border: rgba(0, 0, 0, 0.1); /* Borda cinza suave */
+            --text: #1f2937; /* Texto escuro */
+            --muted: #6b7280; /* Texto secundário */
+            --success: #10b981; 
+            --danger: #ef4444; 
+            --warning: #f59e0b; 
+        }
         * { box-sizing: border-box; }
         body { font-family: 'Jost', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; margin: 0; padding: 0; }
         .serif { font-family: 'Cormorant Garamond', serif; }
         
-        .glass { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
-        .stat-card { background: linear-gradient(135deg, var(--card), #161616); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 4px; }
+        .glass { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         
-        .input-field { width: 100%; background: #0a0a0a; border: 1px solid var(--border); color: var(--text); padding: 12px 14px; border-radius: 8px; outline: none; font-size: 14px; margin-top: 4px; transition: 0.2s; }
-        .input-field:focus { border-color: var(--gold); }
-        .input-field:disabled { opacity: 0.5; cursor: not-allowed; }
+        .input-field { width: 100%; background: #ffffff; border: 1px solid var(--border); color: var(--text); padding: 12px 14px; border-radius: 8px; outline: none; font-size: 14px; margin-top: 4px; transition: 0.2s; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02); }
+        .input-field:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(201,168,76,0.2); }
+        .input-field:disabled { opacity: 0.5; cursor: not-allowed; background: #f3f4f6; }
         
         .btn-primary { background: var(--gold); color: #000; font-weight: 700; text-transform: uppercase; font-size: 12px; padding: 12px 20px; border-radius: 8px; border: none; cursor: pointer; width: 100%; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-primary:hover { background: var(--gold-light); }
         .btn-outline { background: transparent; color: var(--gold); border: 1px solid var(--gold); font-weight: 600; text-transform: uppercase; font-size: 12px; padding: 12px 20px; border-radius: 8px; cursor: pointer; width: 100%; text-align: center; }
-        .btn-danger { background: rgba(255, 91, 91, 0.1); color: var(--danger); border: 1px solid rgba(255, 91, 91, 0.3); font-weight: 600; font-size: 11px; padding: 8px 12px; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); font-weight: 600; font-size: 11px; padding: 8px 12px; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
         
         .tab-btn { flex: 1; padding: 12px; text-align: center; font-size: 12px; font-weight: 600; border-bottom: 2px solid transparent; color: var(--muted); cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; }
         .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
         
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
-        .badge.pendente { background: rgba(245, 166, 35, 0.1); color: var(--warning); border: 1px solid rgba(245, 166, 35, 0.3); }
-        .badge.concluido { background: rgba(91, 221, 91, 0.1); color: var(--success); border: 1px solid rgba(91, 221, 91, 0.3); }
-        .badge.cancelado { background: rgba(255, 91, 91, 0.1); color: var(--danger); border: 1px solid rgba(255, 91, 91, 0.3); }
-        .badge.bloqueio { background: rgba(136, 136, 136, 0.2); color: #fff; border: 1px solid rgba(136, 136, 136, 0.5); }
+        .badge.pendente { background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge.concluido { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge.cancelado { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .badge.bloqueio { background: #f3f4f6; color: var(--muted); border: 1px solid var(--border); }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: var(--card); width: 100%; max-width: 450px; border-radius: 16px; padding: 24px; border: 1px solid var(--border); max-height: 90vh; overflow-y: auto; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: var(--card); width: 100%; max-width: 450px; border-radius: 16px; padding: 24px; border: 1px solid var(--border); max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
 
-        .nav-sidebar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,10,0.95); backdrop-filter: blur(10px); border-top: 1px solid var(--border); display: flex; z-index: 100; padding-bottom: env(safe-area-inset-bottom, 0px); overflow-x: auto; scrollbar-width: none; }
+        .nav-sidebar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-top: 1px solid var(--border); display: flex; z-index: 100; padding-bottom: env(safe-area-inset-bottom, 0px); overflow-x: auto; scrollbar-width: none; }
         .nav-sidebar::-webkit-scrollbar { display: none; }
         .nav-item { min-width: 72px; flex: 1; text-align: center; padding: 12px 4px; color: var(--muted); font-size: 10px; font-weight: 600; text-transform: uppercase; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: 0.2s; }
         .nav-item.active { color: var(--gold); }
 
         .login-wrap { min-height: 100svh; display: flex; align-items: center; justify-content: center; padding: 20px; background: url('img/hero_bg.jpg') center/cover; position: relative; }
-        .login-wrap::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.98), rgba(0,0,0,0.8)); }
+        .login-wrap::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(255,255,255,1), rgba(255,255,255,0.85)); }
         
         .fade-in { animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -76,12 +88,23 @@
             indisponibilidade: { 'Barbeiro 1': [0, 1], 'Barbeiro 2': [0, 2], 'Barbeiro 3': [0, 3] },
             servicos: [
                 { id: 1, nome: 'Corte Masculino', preco: 30, duracao: '40 min', group: 'Cortes e Cabelo', img: 'img/corte_masculino.jpg' },
+                { id: 11, nome: 'Corte Social (Máquina)', preco: 25, duracao: '30 min', group: 'Cortes e Cabelo', img: 'img/corte_social.jpg' },
+                { id: 10, nome: 'Corte Infantil', preco: 35, duracao: '45 min', group: 'Cortes e Cabelo', img: 'img/corte_infantil.jpg' },
                 { id: 2, nome: 'Barba Completa', preco: 20, duracao: '20 min', group: 'Barba e Detalhes', img: 'img/barba_completa.jpg' },
-                { id: 3, nome: 'Combo Corte + Barba', preco: 45, duracao: '60 min', group: 'Barba e Detalhes', img: 'img/combo_corte_barba.jpg' }
+                { id: 3, nome: 'Combo Corte + Barba', preco: 45, duracao: '60 min', group: 'Barba e Detalhes', img: 'img/combo_corte_barba.jpg' },
+                { id: 7, nome: 'Sobrancelha', preco: 10, duracao: '10 min', group: 'Barba e Detalhes', img: 'img/sobrancelha.jpg' },
+                { id: 4, nome: 'Pigmentação', preco: 15, duracao: '15 min', group: 'Química e Cor', img: 'img/pigmentacao.jpg' },
+                { id: 8, nome: 'Platinado', preco: 80, duracao: '2h+', group: 'Química e Cor', img: 'img/platinado.jpg' }
             ],
             produtos: [
                 { id: 101, nome: 'Kit Pomada/Gel Black', preco: 45, categoria: 'Cabelo', img: 'img/produto_pomada.jpg', sub: 'Modeladores', estoque: 10 },
-                { id: 201, nome: 'Perfume Árabe Oud', preco: 180, categoria: 'Perfumes', img: 'img/arabe1.jpg', sub: 'Árabes', estoque: 4 }
+                { id: 301, nome: 'Camisa Retrô Edição', preco: 150, categoria: 'Camisas', img: 'img/camisa_atual.jpg', sub: 'Times', estoque: 5 },
+                { id: 302, nome: 'Camisa Time BR', preco: 120, categoria: 'Camisas', img: 'img/camisa-de-time-na-Shopee.jpg', sub: 'Times', estoque: 8 },
+                { id: 201, nome: 'Perfume Árabe Oud', preco: 180, categoria: 'Perfumes', img: 'img/arabe1.jpg', sub: 'Árabes', estoque: 4 },
+                { id: 211, nome: 'Eudora Homem', preco: 130, categoria: 'Perfumes', img: 'img/eudora1.jpg', sub: 'Eudora', estoque: 6 },
+                { id: 221, nome: 'Importado Premium', preco: 250, categoria: 'Perfumes', img: 'img/importado1.jpg', sub: 'Importados', estoque: 2 },
+                { id: 241, nome: 'Natura Homem', preco: 150, categoria: 'Perfumes', img: 'img/natura1.jpg', sub: 'Natura', estoque: 12 },
+                { id: 251, nome: 'Malbec Tradicional', preco: 180, categoria: 'Perfumes', img: 'img/oboticario1.jpg', sub: 'O Boticário', estoque: 7 }
             ],
             despesas: []
         };
@@ -167,7 +190,7 @@
                         <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 360 }}>
                             <div style={{ textAlign: 'center', marginBottom: 32 }}>
                                 <div style={{ width: 64, height: 64, background: 'var(--gold)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontSize: 32, fontWeight: 700, margin: '0 auto 16px' }}>V</div>
-                                <h1 className="serif" style={{ fontSize: 32 }}>Gestão Victorino</h1>
+                                <h1 className="serif" style={{ fontSize: 32, color: '#1f2937' }}>Gestão Victorino</h1>
                             </div>
                             <form className="glass" onSubmit={handleLogin}>
                                 <div style={{ marginBottom: 16 }}><label style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase' }}>Usuário</label><input name="login" required className="input-field" /></div>
@@ -287,10 +310,10 @@
                             {combined.map(item => {
                                 if (item._type === 'bloqueio') {
                                     return (
-                                        <div key={`blk-${item.id}`} className="glass" style={{ borderColor: 'rgba(136, 136, 136, 0.3)', background: 'rgba(20,20,20,0.5)' }}>
+                                        <div key={`blk-${item.id}`} className="glass" style={{ borderColor: 'var(--border)', background: '#f9fafb' }}>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                 <div>
-                                                    <p style={{ fontWeight: 700, fontSize: 14, color: '#aaa', display: 'flex', alignItems:'center', gap:6 }}><Icon name="lock" size={14}/> {item.motivo || 'Bloqueado'}</p>
+                                                    <p style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)', display: 'flex', alignItems:'center', gap:6 }}><Icon name="lock" size={14}/> {item.motivo || 'Bloqueado'}</p>
                                                     <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4 }}>{item.barberName} • {item.tipo === 'horario' ? formataData(item.data) : 'Período de Folga'}</p>
                                                 </div>
                                                 <div style={{ textAlign: 'right' }}>
@@ -317,11 +340,11 @@
                                                 <p className="serif" style={{ fontSize: 18, marginTop: 6 }}>R$ {item.totalPrice.toFixed(2)}</p>
                                             </div>
                                         </div>
-                                        <p style={{ fontSize: 12, background: '#1a1a1a', padding: '6px 10px', borderRadius: 6 }}>✂️ {item.serviceName}</p>
+                                        <p style={{ fontSize: 12, background: '#f3f4f6', padding: '6px 10px', borderRadius: 6 }}>✂️ {item.serviceName}</p>
                                         
                                         {(item.status === 'pendente' || !item.status) && (
                                             <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-                                                <button onClick={() => updateStatus(item.id, 'concluido')} className="btn-primary" style={{ padding: 8, flex: 1, background: 'var(--success)', color: '#000' }}>Concluir</button>
+                                                <button onClick={() => updateStatus(item.id, 'concluido')} className="btn-primary" style={{ padding: 8, flex: 1, background: 'var(--success)', color: '#fff' }}>Concluir</button>
                                                 <button onClick={() => saveAgendamentos(agendamentos.map(a => a.id === item.id ? { ...a, status: 'cancelado' } : a))} className="btn-danger" style={{ flex: 1 }}>Cancelar</button>
                                             </div>
                                         )}
@@ -563,7 +586,7 @@
 
             return (
                 <div className="main-wrap">
-                    <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, background: 'rgba(5,5,5,0.95)', backdropFilter: 'blur(10px)', zIndex: 50 }}>
+                    <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', zIndex: 50 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                             <div style={{ width: 32, height: 32, background: 'var(--gold)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontWeight: 'bold' }}>V</div>
                             <div><h1 className="serif" style={{ fontSize: 18, lineHeight: 1 }}>{user.role === 'admin' ? 'Admin Geral' : 'Portal do Barbeiro'}</h1><p style={{ fontSize: 10, color: 'var(--gold)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{user.nome}</p></div>
